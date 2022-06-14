@@ -1,0 +1,19 @@
+version : "3.1"
+
+services:
+
+  db:
+    image: postgres:14.3-alpine
+    container_name: bagoh-postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=bagoh-db
+      - POSTGRES_USER=bagoh
+      - POSTGRES_PASSWORD=bagoh12345678
+    ports:
+      - "5432:5432"
+    volumes:
+      - bagoh-volume:/var/lib/posgresql/data
+
+volumes:
+  bagoh-volume:
