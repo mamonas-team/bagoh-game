@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="cae7f60e-5993-4f45-8742-a5eba3d24fe9" name="Changes" comment="" />
+    <list default="true" id="cae7f60e-5993-4f45-8742-a5eba3d24fe9" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/application/game/models/MatchDto.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/application/game/repository/MatchRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/application/game/repository/entities/Match.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/src/main/java/application/game/services/MatchServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/application/game/controllers/MatchController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/application/game/controllers/MatchController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/application/game/services/MatchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/application/game/services/MatchService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
