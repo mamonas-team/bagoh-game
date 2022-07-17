@@ -1,13 +1,13 @@
-package application;
+package bagoh.game.application;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class BagohApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(BagohApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 
 }
