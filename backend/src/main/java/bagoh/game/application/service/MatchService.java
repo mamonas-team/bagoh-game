@@ -3,6 +3,7 @@ package bagoh.game.application.service;
 import bagoh.game.application.dto.Match;
 import bagoh.game.application.dto.Player;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class MatchService {
@@ -23,6 +24,7 @@ public class MatchService {
         for (int i = 1; i <= numberOfPlayers; i++){
             String name = "Jogador-" + i;
             Player player = new Player(match.getNumberOfInitialDices(), name);
+            player.setId(Long.valueOf(i));
             players.add(player);
         }
     }
@@ -33,35 +35,32 @@ public class MatchService {
         }
     }
 
-    @B1
     public void gerarDadosJogadores(){
         // popular players com numeros aleatorios, pra cada jogador.
     };
 
-    @Dadalt
     public void definirPrimeiroJogador(){
         // gerar um numero aleatorio de 1 a 6 pra cada player
         // ver qual o maior e definir PrimeiroJogador
         // Definir PrimeiroJogador como playerOfTheTurn.
     };
 
-    @Grosso
-    public Long fazerAposta(Long idJogador, Long[2] aposta, String ordem){
+    public Long fazerAposta(Long idJogador, Long[] aposta, String ordem){
         //vai dar erro se o nro de jogadores n for igual match.getNumberOfPlayer
         //vai dar erro se iniciarNovoTurno n for chamada antes
         long totalNumberOfDices = 0L;
         boolean validBid = false;
         for (Player player : players){
-            totalNumberOfDices += player.getNumberOfDices;
+            totalNumberOfDices += player.getNumberOfDices();
         }
         if (aposta[0] > totalNumberOfDices){
-            return -1L; //nro de dados na aposta maior que o nro de dados na mesas
+            throw new IllegalArgumentException("Número de dados ("+aposta[0]+") na aposta maior que o número de dados ("+totalNumberOfDices+") na mesas.");
         } else if (aposta[0] <= 0L || aposta[1] < 1L || aposta[1] > 6L){
-            return -1L; //aposta invalida
+            throw new IllegalArgumentException("Aposta inválida.");
         }
-        Long[2] higherBagohBid = {0L,1L};
-        Long[2] higherNormalBid = {0L,0L};
-        for (int i = 0; i<betHistory.length() ; i++){
+        Long[] higherBagohBid = {0L,1L};
+        Long[] higherNormalBid = {0L,0L};
+        for (int i = 0; i< betHistory.length ; i++){
             if (betHistory[i][1] == 1L && betHistory[i][0] > higherBagohBid[0]) {
                 higherBagohBid = betHistory[i];
             }else if (betHistory[i][1] != 1L && betHistory[i][0] >= higherNormalBid[0]){
@@ -96,28 +95,43 @@ public class MatchService {
             }
         }
         if (validBid){
-            int posicao = 0;
+            //Adiocionar aposta no betHistory
+            boolean betHistoryIsFull = true;
+            for (int i = 0; i< betHistory.length ; i++){
+                if(betHistory[i][0] == 0L){
+                    betHistory[i] = aposta;
+                    betHistoryIsFull = false;
+                    break;
+                }
+            }
+            if (betHistoryIsFull){
+                for (int i = 0; i< betHistory.length-1 ; i++){
+                    betHistory[i] = betHistory[i+1];
+                }
+                betHistory[betHistory.length-1] = aposta;
+            }
+            //Encontrar id do proximo jogador
+            int playerPosition = 0;
             for (Player player : players){
                 if (player.getId() == idJogador){
-                    break
+                    break;
                 };
-                i += 1;
+                playerPosition += 1;
             }
-            if (ordem == 'cima-baixo' && i < match.getNumberOfPlayer()-1){
-                return players[i+1].getId();
-            } else if (ordem == 'cima-baixo') {
-                return players[0].getId();
-            } else if (ordem == 'baixo-cima' && i > 0) {
-                return players[i-1].getId();
+            if (ordem == "cima-baixo" && playerPosition < match.getNumberOfPlayer()-1){
+                return players.get(playerPosition+1).getId();
+            } else if (ordem == "cima-baixo") {
+                return players.get(0).getId();
+            } else if (ordem == "baixo-cima" && playerPosition > 0) {
+                return players.get(playerPosition-1).getId();
             } else{
-                return players[match.getNumberOfPlayer()-1].getId();
+                return players.get(Math.toIntExact(match.getNumberOfPlayer()-1L)).getId();
             }
         } else {
-            return -1L //aposta invalida
+            throw new IllegalArgumentException("Aposta não é maior que a anterior ou já foi feita.");
         }
     }
 
-    @Carnica
     public void duvidarDeAposta (){
         // validar se a aposta é verdadeira
         // informar quem venceu a aposta (quem apostou ou quem duvidou)
@@ -128,18 +142,8 @@ public class MatchService {
     public void iniciarNovoTurno(){
         // gerarDadosProsPlayers (respeitando a quatde de dados de cada Player)
         // informar de quem é a vez ( quem perdeu dado recomeça o turno)
-        Arrays.fill(betHistory, 0);
+        Arrays.fill(betHistory, new Long[]{0L,0L});
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
