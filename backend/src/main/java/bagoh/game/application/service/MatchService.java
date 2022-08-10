@@ -54,7 +54,7 @@ public class MatchService {
             totalNumberOfDices += player.getNumberOfDices();
         }
         if (aposta[0] > totalNumberOfDices){
-            throw new IllegalArgumentException("Número de dados ("+aposta[0]+") na aposta maior que o número de dados ("+totalNumberOfDices+") na mesas.");
+            throw new IllegalArgumentException("Número de dados na aposta ("+aposta[0]+") maior que o número de dados na mesas ("+totalNumberOfDices+").");
         } else if (aposta[0] <= 0L || aposta[1] < 1L || aposta[1] > 6L){
             throw new IllegalArgumentException("Aposta inválida.");
         }

@@ -49,18 +49,33 @@ public class Application {
 		System.out.println("aposta de 5 duques passou. O próximo jogador é jogador-"+proximo);
 		proximo = matchService.fazerAposta(proximo, new Long[]{3L, 1L},"baixo-cima");
 		System.out.println("aposta de 3 bagos passou. O próximo jogador é jogador-"+proximo);
+		proximo = matchService.fazerAposta(proximo, new Long[]{6L, 4L},"baixo-cima");
+		System.out.println("aposta de 6 quadras passou. O próximo jogador é jogador-"+proximo);
+		proximo = matchService.fazerAposta(proximo, new Long[]{6L, 5L},"baixo-cima");
+		System.out.println("aposta de 6 quinas passou. O próximo jogador é jogador-"+proximo);
+		proximo = matchService.fazerAposta(proximo, new Long[]{4L, 1L},"baixo-cima");
+		System.out.println("aposta de 4 bagos passou. O próximo jogador é jogador-"+proximo);
+		proximo = matchService.fazerAposta(proximo, new Long[]{5L, 1L},"baixo-cima");
+		System.out.println("aposta de 5 bagos passou. O próximo jogador é jogador-"+proximo);
 
 		System.out.println("\n\n Testando alguns erros: ");
 		try{
-			System.out.println("Fazendo uma aposta repetida (3 bagos):");
-			proximo = matchService.fazerAposta(proximo, new Long[]{3L, 1L},"baixo-cima");
+			System.out.println("Fazendo uma aposta repetida (5 bagos):");
+			proximo = matchService.fazerAposta(proximo, new Long[]{5L, 1L},"baixo-cima");
 		} catch (IllegalArgumentException e){
 			System.out.println(e.getMessage());
 		}
 
 		try{
-			System.out.println("Fazendo uma aposta menor (5 senas):");
-			proximo = matchService.fazerAposta(proximo, new Long[]{5L, 6L},"baixo-cima");
+			System.out.println("Fazendo uma aposta menor (9 senas):");
+			proximo = matchService.fazerAposta(proximo, new Long[]{9L, 6L},"baixo-cima");
+		} catch (IllegalArgumentException e){
+			System.out.println(e.getMessage());
+		}
+
+		try{
+			System.out.println("Fazendo uma aposta de 20 dados (o total é de 15 na mesa):");
+			proximo = matchService.fazerAposta(proximo, new Long[]{20L, 6L},"baixo-cima");
 		} catch (IllegalArgumentException e){
 			System.out.println(e.getMessage());
 		}
