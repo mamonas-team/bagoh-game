@@ -1,4 +1,4 @@
-package bagoh.game.application.dto;
+package bagoh.game.application.dto.domainDto;
 
 public class Player {
 

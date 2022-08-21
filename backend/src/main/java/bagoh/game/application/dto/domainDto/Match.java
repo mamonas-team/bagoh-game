@@ -1,4 +1,4 @@
-package bagoh.game.application.dto;
+package bagoh.game.application.dto.domainDto;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +11,7 @@ public class Match {
     private Long id;
     private Long numberOfPlayer;
     private Long numberOfInitialDices;
+    private int totalDicesMatch;
     private Player playerOfTheTurn;
     private List<Player> players = new ArrayList<>();
 
@@ -54,6 +55,17 @@ public class Match {
 
     public Long getNumberOfInitialDices() {
         return numberOfInitialDices;
+    }
+
+    public int getTotalDicesMatch() {
+        for (Player player : players){
+            totalDicesMatch += player.getNumberOfDices();
+        }
+        return totalDicesMatch;
+    }
+
+    public void setTotalDicesMatch(int totalDicesMatch) {
+        this.totalDicesMatch = totalDicesMatch;
     }
 
     public void setNumberOfInitialDices(Long numberOfInitialDices) {
