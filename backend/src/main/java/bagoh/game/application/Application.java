@@ -1,5 +1,7 @@
 package bagoh.game.application;
 
+import bagoh.game.application.dto.domainDto.Bid;
+import bagoh.game.application.dto.domainDto.BidTypes;
 import bagoh.game.application.dto.domainDto.Match;
 import bagoh.game.application.service.MatchService;
 import org.springframework.boot.SpringApplication;
@@ -24,82 +26,90 @@ public class Application {
 
 		//Teste se o método está retornando certo o próximo jogador
 		matchService.iniciarNovoTurno();
-		System.out.println("\n Primeiro a jogar: jogador-1");
-		Long proximo = matchService.fazerAposta(1L, new Long[]{2L, 1L},"cima-baixo");
-		System.out.println("aposta de 2 bagos passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{4L, 3L},"cima-baixo");
-		System.out.println("aposta de 4 ternas passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{4L, 6L},"cima-baixo");
-		System.out.println("aposta de 4 senas passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{5L, 2L},"cima-baixo");
-		System.out.println("aposta de 5 duques passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{3L, 1L},"cima-baixo");
-		System.out.println("aposta de 3 bagos passou. O próximo jogador é jogador-"+proximo);
+		Bid bid1 = new Bid(BidTypes.BAGO,2,1L);
+		Long proximo = matchService.fazerAposta(1L, bid1,"top-down");
+
+		Bid bid2 = new Bid(BidTypes.TERNO,4, proximo);
+		proximo = matchService.fazerAposta(proximo, bid2,"top-down");
+
+		Bid bid3 = new Bid(BidTypes.SENA,4, proximo);
+		proximo = matchService.fazerAposta(proximo, bid3,"top-down");
+
+		Bid bid4 = new Bid(BidTypes.DUQUE,5, proximo);
+		proximo = matchService.fazerAposta(proximo, bid4,"top-down");
+
+		Bid bid5 = new Bid(BidTypes.BAGO,3, proximo);
+		proximo = matchService.fazerAposta(proximo, bid5,"top-down");
+
+		Bid bid6 = new Bid(BidTypes.QUADRA,6, proximo);
+		proximo = matchService.fazerAposta(proximo, bid6,"top-down");
+
+		Bid bid7 = new Bid(BidTypes.QUINA,6, proximo);
+		proximo = matchService.fazerAposta(proximo, bid7,"top-down");
+
+		Bid bid8 = new Bid(BidTypes.BAGO,4, proximo);
+		proximo = matchService.fazerAposta(proximo, bid8,"top-down");
+
+		Bid bid9 = new Bid(BidTypes.BAGO,5, proximo);
+		proximo = matchService.fazerAposta(proximo, bid9,"top-down");
 
 		matchService.iniciarNovoTurno();
 		System.out.println("\n\n Na ordem contrária agora:");
-		System.out.println("Primeiro: jogador-5");
-		proximo = matchService.fazerAposta(5L, new Long[]{2L, 1L},"baixo-cima");
-		System.out.println("aposta de 2 bagos passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{4L, 3L},"baixo-cima");
-		System.out.println("aposta de 4 ternas passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{4L, 6L},"baixo-cima");
-		System.out.println("aposta de 4 senas passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{5L, 2L},"baixo-cima");
-		System.out.println("aposta de 5 duques passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{3L, 1L},"baixo-cima");
-		System.out.println("aposta de 3 bagos passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{6L, 4L},"baixo-cima");
-		System.out.println("aposta de 6 quadras passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{6L, 5L},"baixo-cima");
-		System.out.println("aposta de 6 quinas passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{4L, 1L},"baixo-cima");
-		System.out.println("aposta de 4 bagos passou. O próximo jogador é jogador-"+proximo);
-		proximo = matchService.fazerAposta(proximo, new Long[]{5L, 1L},"baixo-cima");
-		System.out.println("aposta de 5 bagos passou. O próximo jogador é jogador-"+proximo);
+		Bid bid10 = new Bid(BidTypes.BAGO,2,1L);
+		proximo = matchService.fazerAposta(1L, bid10,"bottom-up");
+
+		Bid bid20 = new Bid(BidTypes.TERNO,4, proximo);
+		proximo = matchService.fazerAposta(proximo, bid20,"bottom-up");
+
+		Bid bid30 = new Bid(BidTypes.SENA,4, proximo);
+		proximo = matchService.fazerAposta(proximo, bid30,"bottom-up");
+
+		Bid bid40 = new Bid(BidTypes.DUQUE,5, proximo);
+		proximo = matchService.fazerAposta(proximo, bid40,"bottom-up");
+
+		Bid bid50 = new Bid(BidTypes.BAGO,3, proximo);
+		proximo = matchService.fazerAposta(proximo, bid50,"bottom-up");
+
+		Bid bid60 = new Bid(BidTypes.QUADRA,6, proximo);
+		proximo = matchService.fazerAposta(proximo, bid60,"bottom-up");
+
+		Bid bid70 = new Bid(BidTypes.QUINA,6, proximo);
+		proximo = matchService.fazerAposta(proximo, bid70,"bottom-up");
+
+		Bid bid80 = new Bid(BidTypes.BAGO,4, proximo);
+		proximo = matchService.fazerAposta(proximo, bid80,"bottom-up");
+
+		Bid bid90 = new Bid(BidTypes.BAGO,5, proximo);
+		proximo = matchService.fazerAposta(proximo, bid9,"bottom-up");
 
 		System.out.println("\n\n Testando alguns erros: ");
-		try{
-			System.out.println("Fazendo uma aposta repetida (5 bagos):");
-			proximo = matchService.fazerAposta(proximo, new Long[]{5L, 1L},"baixo-cima");
-		} catch (IllegalArgumentException e){
-			System.out.println(e.getMessage());
-		}
 
-		try{
-			System.out.println("Fazendo uma aposta menor (9 senas):");
-			proximo = matchService.fazerAposta(proximo, new Long[]{9L, 6L},"baixo-cima");
-		} catch (IllegalArgumentException e){
-			System.out.println(e.getMessage());
-		}
+		System.out.println("\nFazendo uma aposta repetida (5 bagos):");
+		Bid bid = new Bid(BidTypes.BAGO,5, proximo);
+		proximo = matchService.fazerAposta(1l, bid,"bottom-up");
 
-		try{
-			System.out.println("Fazendo uma aposta de 20 dados (o total é de 15 na mesa):");
-			proximo = matchService.fazerAposta(proximo, new Long[]{20L, 6L},"baixo-cima");
-		} catch (IllegalArgumentException e){
-			System.out.println(e.getMessage());
-		}
+		System.out.println("\nFazendo uma aposta menor (9 senas):");
+		bid.setType(BidTypes.SENA);
+		bid.setQuantity(9);
+		proximo = matchService.fazerAposta(1l, bid,"bottom-up");
 
-		try{
-			System.out.println("Fazendo uma aposta inválida (-4 bagos):");
-			proximo = matchService.fazerAposta(proximo, new Long[]{-3L, 1L},"baixo-cima");
-		} catch (IllegalArgumentException e){
-			System.out.println(e.getMessage());
-		}
+		System.out.println("\nFazendo uma aposta de 20 dados (o total é de 15 na mesa):");
+		bid.setType(BidTypes.SENA);
+		bid.setQuantity(20);
+		proximo = matchService.fazerAposta(1l, bid,"bottom-up");
 
-		try{
-			System.out.println("Fazendo uma aposta inválida (8 faces 7):");
-			proximo = matchService.fazerAposta(proximo, new Long[]{3L, 7L},"baixo-cima");
-		} catch (IllegalArgumentException e){
-			System.out.println(e.getMessage());
-		}
+//		System.out.println("\nFazendo uma aposta inválida (10 dados de face 7):");
+//		try{
+//			bid.setType(7);
+//			bid.setQuantity(10);
+//			proximo = matchService.fazerAposta(1l, bid,"bottom-up");
+//		} catch (RuntimeException e) {
+//			System.out.println(e.getMessage());
+//		}
 
-		try{
-			System.out.println("Fazendo uma aposta inválida (8 faces -2):");
-			proximo = matchService.fazerAposta(proximo, new Long[]{3L, -2L},"baixo-cima");
-		} catch (IllegalArgumentException e){
-			System.out.println(e.getMessage());
-		}
-
+		System.out.println("\npassando um idJogador inexistente (-1L):");
+		bid.setType(BidTypes.SENA);
+		bid.setQuantity(10);
+		proximo = matchService.fazerAposta(-1l, bid,"bottom-up");
 	}
 }

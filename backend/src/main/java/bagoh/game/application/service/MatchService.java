@@ -35,6 +35,18 @@ public class MatchService {
         }
     }
 
+    public Long fazerAposta(Long idJogador, Bid bid, String order) {
+        System.out.println("Vez do jogador-"+idJogador);
+        Long proximo = makeBet(idJogador, bid, order);
+        if (bid.isValid()) {
+            System.out.println("aposta de "+bid.getQuantity()+" "+bid.getType()+" passou. O próximo jogador é jogador-"+proximo+"\n");
+            return proximo;
+        } else {
+            System.out.println(bid.getInvalidReason());
+            return proximo;
+        }
+    }
+
     public void printPlayers() {
         for (Player player : players) {
             System.out.println(player.getName());
@@ -55,117 +67,43 @@ public class MatchService {
 
     ;
 
-    public Long fazerAposta(Long idJogador, Long[] aposta, String ordem) {
-        //vai dar erro se o nro de jogadores n for igual match.getNumberOfPlayer
-        //vai dar erro se iniciarNovoTurno n for chamada antes
-        long totalNumberOfDices = 0L;
-        boolean validBid = false;
-        for (Player player : players) {
-            totalNumberOfDices += player.getNumberOfDices();
-        }
-        if (aposta[0] > totalNumberOfDices) {
-            throw new IllegalArgumentException("Número de dados na aposta (" + aposta[0] + ") maior que o número de dados na mesas (" + totalNumberOfDices + ").");
-        } else if (aposta[0] <= 0L || aposta[1] < 1L || aposta[1] > 6L) {
-            throw new IllegalArgumentException("Aposta inválida.");
-        }
-        Long[] higherBagohBid = {0L, 1L};
-        Long[] higherNormalBid = {0L, 0L};
-        for (int i = 0; i < betHistory.length; i++) {
-            if (betHistory[i][1] == 1L && betHistory[i][0] > higherBagohBid[0]) {
-                higherBagohBid = betHistory[i];
-            } else if (betHistory[i][1] != 1L && betHistory[i][0] >= higherNormalBid[0]) {
-                if (betHistory[i][0] > higherNormalBid[0]) {
-                    higherNormalBid = betHistory[i];
-                } else if (betHistory[i][1] > higherNormalBid[1]) {
-                    higherNormalBid = betHistory[i];
-                }
-            }
-        }
-        if (higherNormalBid[0] == 2 * higherBagohBid[0]) {
-            if (aposta[1] == 1L && aposta[0] > higherBagohBid[0]) {
-                validBid = true;
-            } else if (aposta[1] > higherNormalBid[1] && aposta[0] >= higherNormalBid[0]) {
-                validBid = true;
-            } else if (aposta[1] <= higherNormalBid[1] && aposta[0] > higherNormalBid[0]) {
-                validBid = true;
-            }
-        } else if (higherNormalBid[0] > 2 * higherBagohBid[0]) {
-            if (aposta[1] == 1L && aposta[0] >= Math.ceil(higherNormalBid[0] / 2)) {
-                validBid = true;
-            } else if (aposta[1] > higherNormalBid[1] && aposta[0] >= higherNormalBid[0]) {
-                validBid = true;
-            } else if (aposta[1] <= higherNormalBid[1] && aposta[0] > higherNormalBid[0]) {
-                validBid = true;
-            }
-        } else if (higherNormalBid[0] < 2 * higherBagohBid[0]) {
-            if (aposta[1] == 1L && aposta[0] > higherBagohBid[0]) {
-                validBid = true;
-            } else if (aposta[1] != 1L && aposta[0] >= 2 * higherBagohBid[0]) {
-                validBid = true;
-            }
-        }
-        if (validBid) {
-            //Adiocionar aposta no betHistory
-            boolean betHistoryIsFull = true;
-            for (int i = 0; i < betHistory.length; i++) {
-                if (betHistory[i][0] == 0L) {
-                    betHistory[i] = aposta;
-                    betHistoryIsFull = false;
-                    break;
-                }
-            }
-            if (betHistoryIsFull) {
-                for (int i = 0; i < betHistory.length - 1; i++) {
-                    betHistory[i] = betHistory[i + 1];
-                }
-                betHistory[betHistory.length - 1] = aposta;
-            }
-            //Encontrar id do proximo jogador
-            int playerPosition = 0;
-            for (Player player : players) {
-                if (player.getId() == idJogador) {
-                    break;
-                }
-                ;
-                playerPosition += 1;
-            }
-            if (ordem == "cima-baixo" && playerPosition < match.getNumberOfPlayer() - 1) {
-                return players.get(playerPosition + 1).getId();
-            } else if (ordem == "cima-baixo") {
-                return players.get(0).getId();
-            } else if (ordem == "baixo-cima" && playerPosition > 0) {
-                return players.get(playerPosition - 1).getId();
-            } else {
-                return players.get(Math.toIntExact(match.getNumberOfPlayer() - 1L)).getId();
-            }
-        } else {
-            throw new IllegalArgumentException("Aposta não é maior que a anterior ou já foi feita.");
-        }
-    }
 
     public Long makeBet(Long idJogador, Bid bid, String order) {
         int bidQuantity = bid.getQuantity();
         int bidType = bid.getType().getNumericType();
 
-        initialBidValidation(bid, bidQuantity, bidType);
-        bidValidation(bid, bidQuantity, bidType);
+        initialBidValidation(bid, bidQuantity, bidType, idJogador);
+        if (bid.isValid()){
+            bid.setValid(false);
+            bidValidation(bid, bidQuantity, bidType);
+        }
         if (bid.isValid()) {
-            betsHistory.add(bid);
-            Long nextPlayer = getNextPlayer(idJogador, order);
-            return nextPlayer;
+            this.betsHistory.add(bid);
+            return getNextPlayer(idJogador, order);
         } else {
             return -1L;
         }
 
     }
 
-    private void initialBidValidation(Bid bid, int bidQuantity, int bidType) {
+    private void initialBidValidation(Bid bid, int bidQuantity, int bidType, Long idJogador) {
         int bago = 1;
         int sena = 6;
-        if (bidQuantity > totalDicesMatch){
-            bid.setInvalidReason("Aposta maior que a quantidade de dados na mesa");
+        int playerPosition = 0;
+        boolean findPlayer = false;
+        for (Player player : players) {
+            if (player.getId() == idJogador) {
+                findPlayer = true;
+                break;
+            }
+            playerPosition += 1;
+        }
+        if (!findPlayer){
+            bid.setInvalidReason("Jogador não identificado, id inexistente.");
+        }else if (bidQuantity > totalDicesMatch){
+            bid.setInvalidReason("Aposta maior que a quantidade de dados na mesa.");
         } else if (bidQuantity <= 0 || bidType < bago || bidType > sena){
-            bid.setInvalidReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas");
+            bid.setInvalidReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.");
         } else {
             bid.setValid(true);
         }
@@ -199,7 +137,8 @@ public class MatchService {
             } else if (bidType != 1 && bidQuantity >= 2* higherBagoBidQuantity) {
                 bid.setValid(true);
             }
-        } else {
+        }
+        if(!bid.isValid()){
             bid.setInvalidReason("Aposta inválida. O valor apostado não é maior que a última aposta ou já foi utilizado.");
         }
     }
@@ -208,7 +147,9 @@ public class MatchService {
         Bid higherBagoBid = new Bid(BidTypes.BAGO, 0, 0L);
         int bago = 1;
         for (Bid bid : betsHistory) {
-            if(bid.getType().getNumericType() == 1 && bid.getQuantity() > higherBagoBid.getQuantity()){
+            int bidType = bid.getType().getNumericType();
+            int bidQuantity = bid.getQuantity();
+            if(bidType == 1 && bidQuantity > higherBagoBid.getQuantity()){
                 higherBagoBid = bid;
             }
         }
@@ -216,12 +157,14 @@ public class MatchService {
     }
 
     private Bid getHigherNormalBid() {
-        Bid higherNormalBid = new Bid(BidTypes.BAGO, 0, 0L);
+        Bid higherNormalBid = new Bid(BidTypes.DUQUE, 0, 0L);
         for (Bid bid : betsHistory) {
-            if(bid.getType().getNumericType() != 1 && bid.getQuantity() >= higherNormalBid.getQuantity()){
-                if (bid.getQuantity() > higherNormalBid.getQuantity()){
+            int bidType = bid.getType().getNumericType();
+            int bidQuantity = bid.getQuantity();
+            if(bidType != 1 && bidQuantity >= higherNormalBid.getQuantity()){
+                if (bidQuantity > higherNormalBid.getQuantity()){
                     higherNormalBid = bid;
-                } else if (bid.getType().getNumericType() > higherNormalBid.getType().getNumericType()) {
+                } else if (bidType > higherNormalBid.getType().getNumericType()) {
                     higherNormalBid = bid;
                 }
             }
@@ -237,16 +180,18 @@ public class MatchService {
             }
             playerPosition += 1;
         }
-        if (order == "cima-baixo" && playerPosition < match.getNumberOfPlayer() - 1) {
+        if (order == "top-down" && playerPosition < match.getNumberOfPlayer() - 1) {
             return players.get(playerPosition + 1).getId();
-        } else if (order == "cima-baixo") {
+        } else if (order == "top-down") {
             return players.get(0).getId();
-        } else if (order == "baixo-cima" && playerPosition > 0) {
+        } else if (order == "bottom-up" && playerPosition > 0) {
             return players.get(playerPosition - 1).getId();
         } else {
             return players.get(Math.toIntExact(match.getNumberOfPlayer() - 1L)).getId();
         }
     }
+
+    ;
 
     public void duvidarDeAposta (){
         // validar se a aposta é verdadeira
@@ -256,7 +201,8 @@ public class MatchService {
     }
 
     public void iniciarNovoTurno(){
-        betsHistory.clear();
+        this.betsHistory.clear();
+        this.totalDicesMatch = match.getTotalDicesMatch();
         // gerarDadosProsPlayers (respeitando a quatde de dados de cada Player)
         // informar de quem é a vez ( quem perdeu dado recomeça o turno)
     }
