@@ -1,6 +1,6 @@
 package bagoh.game.application.service;
 
-import bagoh.game.application.dto.Player;
+import bagoh.game.application.dto.domainDto.Player;
 
 public class PlayerService {
 
