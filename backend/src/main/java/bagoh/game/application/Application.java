@@ -3,7 +3,7 @@ package bagoh.game.application;
 import bagoh.game.application.dto.domainDto.Bid;
 import bagoh.game.application.dto.domainDto.BidTypes;
 import bagoh.game.application.dto.domainDto.Match;
-import bagoh.game.application.service.MatchService;
+import bagoh.game.application.service.implementation.DefaultMatchService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -19,7 +19,7 @@ public class Application {
 
 
 		//Instancia de um MatchService
-		MatchService matchService = new MatchService(match1);
+		DefaultMatchService matchService = new DefaultMatchService(match1);
 		matchService.inicializarJogadores();
 		System.out.println("Jogadores na partida: ");
 		matchService.printPlayers();
