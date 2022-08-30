@@ -1,14 +1,15 @@
 package bagoh.game.application.service.implementation;
 
-import bagoh.game.application.dto.domainDto.BidTypes;
+import bagoh.game.application.dto.domainDto.DiceValues;
 import bagoh.game.application.dto.domainDto.Match;
 import bagoh.game.application.dto.domainDto.Player;
 import bagoh.game.application.dto.domainDto.Bid;
+import bagoh.game.application.service.MatchService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefaultMatchService {
+public class DefaultMatchService implements MatchService {
 
     private Match match;
     private List<Player> players;
@@ -16,12 +17,13 @@ public class DefaultMatchService {
     private int totalDicesMatch;
 
 
+   // Neste construtor já recebemos o objeto Match, o qual conterá
+   // o id de cada jogador, e a quantidade inicial de dados de cada um.
     public DefaultMatchService(Match match) {
         this.match = match;
         this.players = match.getPlayers();
         this.totalDicesMatch = match.getTotalDicesMatch();
     }
-
 
     public void inicializarJogadores() {
         Long numberOfPlayers = match.getNumberOfPlayer();
@@ -35,7 +37,7 @@ public class DefaultMatchService {
     }
 
     public Long fazerAposta(Long idJogador, Bid bid, String order) {
-        System.out.println("Vez do jogador-"+idJogador);
+        System.out.println("Vez do jogador-" + idJogador);
         Long proximo = makeBet(idJogador, bid, order);
         if (bid.isValid()) {
             System.out.println("aposta de "+bid.getQuantity()+" "+bid.getType()+" passou. O próximo jogador é jogador-"+proximo+"\n");
@@ -51,18 +53,6 @@ public class DefaultMatchService {
             System.out.println(player.getName());
         }
     }
-
-    public void gerarDadosJogadores() {
-        // popular players com numeros aleatorios, pra cada jogador.
-    }
-
-
-    public void definirPrimeiroJogador() {
-        // gerar um numero aleatorio de 1 a 6 pra cada player
-        // ver qual o maior e definir PrimeiroJogador
-        // Definir PrimeiroJogador como playerOfTheTurn.
-    }
-
 
     public Long makeBet(Long idJogador, Bid bid, String order) {
         int bidQuantity = bid.getQuantity();
@@ -140,7 +130,7 @@ public class DefaultMatchService {
     }
 
     private Bid getHigherBagoBid() {
-        Bid higherBagoBid = new Bid(BidTypes.BAGO, 0, 0L);
+        Bid higherBagoBid = new Bid(DiceValues.BAGO, 0, 0L);
         int bago = 1;
         for (Bid bid : betsHistory) {
             int bidType = bid.getType().getNumericType();
@@ -153,7 +143,7 @@ public class DefaultMatchService {
     }
 
     private Bid getHigherNormalBid() {
-        Bid higherNormalBid = new Bid(BidTypes.DUQUE, 0, 0L);
+        Bid higherNormalBid = new Bid(DiceValues.DUQUE, 0, 0L);
         for (Bid bid : betsHistory) {
             int bidType = bid.getType().getNumericType();
             int bidQuantity = bid.getQuantity();
@@ -187,15 +177,6 @@ public class DefaultMatchService {
         }
     }
 
-    ;
-
-    public void duvidarDeAposta (){
-        // validar se a aposta é verdadeira
-        // informar quem venceu a aposta (quem apostou ou quem duvidou)
-        // remover um dado do perdedor
-        // iniciarNovoTurno()
-    }
-
     public void iniciarNovoTurno(){
         this.betsHistory.clear();
         this.totalDicesMatch = match.getTotalDicesMatch();
@@ -203,4 +184,52 @@ public class DefaultMatchService {
         // informar de quem é a vez ( quem perdeu dado recomeça o turno)
     }
 
+
+    @Override
+    public Match inicializarPartida() {
+        // TO-DO: chamar repository pra salvar Partida no banco
+        // TO-DO: Verifica se o Player.firstDice já está preenchido, se não:
+        //          Gerar um dado aleatório pra cada jogador
+        //          Se um jogador tirar um numero maior que os demais, ele é o primeiro
+        //          Neste caso, o método deve setar o Match.firstPlayer, e o Player.firstDice (dentro de Match)
+        //          Se dois jogadores tirarem o mesmo valor, seta apenas o Player.firstDice (de todos os players)
+        //        Se sim:
+        //          Gera apenas um dado aleatório novamente para os players que tinham o maior Player.firstDice
+        //          Se um jogador tirar um número maior que os demais, ele é o primeiro (setando o Match.firstPlayer)
+        //        Se não:
+        //          Seta apenas o Player.firstDice desses jogadores novamente
+        //
+        return this.match;
+    }
+
+    @Override
+    public void gerarDadosJogadores(List<Player> players) {
+        // TO-DO : Gerar Dados Jogaores
+        //         Ou seja, ver o total de dados de cada jogador, e gerar valores aleatorios de 1 a 6, pra cada jogador
+    }
+
+    @Override
+    public Long conduzirJogo() {
+        return null;
+    };
+
+    @Override
+    public List<Bid> registrarAposta() {
+        return null;
+    }
+
+    @Override
+    public boolean validarAposta(Long idJogador, Bid bid) {
+        return false;
+    }
+
+    @Override
+    public void removerDado(Long idPlayer) {
+
+    }
+
+    @Override
+    public Match consultarStatusPartida() {
+        return this.match;
+    }
 }

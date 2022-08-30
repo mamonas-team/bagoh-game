@@ -5,7 +5,8 @@ public class Player {
     private Long id;
     private Long numberOfDices;
     private String name;
-    private int[] dices = new int[6];
+    private DiceValues firtDice;
+    private DiceValues[] dices = new DiceValues[6];
     private boolean status = true;
 
     public Player(Long numberOfDices, String name) {
@@ -37,11 +38,11 @@ public class Player {
         this.name = name;
     }
 
-    public int[] getDices() {
+    public DiceValues[] getDices() {
         return dices;
     }
 
-    public void setDices(int[] dices) {
+    public void setDices(DiceValues[] dices) {
         this.dices = dices;
     }
 
