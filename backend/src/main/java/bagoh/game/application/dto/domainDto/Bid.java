@@ -2,24 +2,24 @@ package bagoh.game.application.dto.domainDto;
 
 public class Bid {
 
-    private BidTypes type;
+    private DiceValues type;
     private int quantity;
     private Long idPlayer;
     private boolean valid = false;
     private String invalidReason = "";
 
-    public Bid(BidTypes type, int quantity, Long idPlayer) {
+    public Bid(DiceValues type, int quantity, Long idPlayer) {
         this.type = type;
         this.quantity = quantity;
         this.idPlayer = idPlayer;
 
     }
 
-    public BidTypes getType() {
+    public DiceValues getType() {
         return type;
     }
 
-    public void setType(BidTypes type) {
+    public void setType(DiceValues type) {
         this.type = type;
     }
 

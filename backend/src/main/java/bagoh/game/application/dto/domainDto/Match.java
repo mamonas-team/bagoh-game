@@ -13,6 +13,7 @@ public class Match {
     private Long numberOfInitialDices;
     private int totalDicesMatch = 0;
     private Player playerOfTheTurn;
+    private Player firstPlayer;
     private List<Player> players = new ArrayList<>();
 
 
