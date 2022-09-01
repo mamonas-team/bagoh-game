@@ -1,15 +1,17 @@
 package bagoh.game.application.dto.domainDto;
 
+import java.util.List;
+
 public class Player {
 
     private Long id;
-    private Long numberOfDices;
+    private int numberOfDices;
     private String name;
-    private DiceValues firtDice;
-    private DiceValues[] dices = new DiceValues[6];
+    private List<DiceValues> firstDice;
+    private DiceValues[] dices = new DiceValues[6]; // TO-DO - talvez seja vetor de int mesmo
     private boolean status = true;
 
-    public Player(Long numberOfDices, String name) {
+    public Player(int numberOfDices, String name) {
         this.numberOfDices = numberOfDices;
         this.name = name;
     }
@@ -22,11 +24,11 @@ public class Player {
         this.id = id;
     }
 
-    public Long getNumberOfDices() {
+    public int getNumberOfDices() {
         return numberOfDices;
     }
 
-    public void setNumberOfDices(Long numberOfDices) {
+    public void setNumberOfDices(int numberOfDices) {
         this.numberOfDices = numberOfDices;
     }
 

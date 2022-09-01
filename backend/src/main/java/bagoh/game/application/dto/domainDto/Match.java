@@ -9,15 +9,17 @@ public class Match {
     private Date startDate;
     private Date finalDate;
     private Long id;
-    private Long numberOfPlayer;
-    private Long numberOfInitialDices;
+    private int numberOfPlayer;
+    private int numberOfInitialDices;
     private int totalDicesMatch = 0;
     private Player playerOfTheTurn;
     private Player firstPlayer;
     private List<Player> players = new ArrayList<>();
+    private List<Bid> betHistory = new ArrayList<>();
+    private Bid lastBid;
 
 
-    public Match(Long numberOfPlayer, Long numberOfInitialDices) {
+    public Match(int numberOfPlayer, int numberOfInitialDices) {
         this.numberOfPlayer = numberOfPlayer;
         this.numberOfInitialDices = numberOfInitialDices;
     }
@@ -46,15 +48,15 @@ public class Match {
         this.id = id;
     }
 
-    public Long getNumberOfPlayer() {
+    public int getNumberOfPlayer() {
         return numberOfPlayer;
     }
 
-    public void setNumberOfPlayer(Long numberOfPlayer) {
+    public void setNumberOfPlayer(int numberOfPlayer) {
         this.numberOfPlayer = numberOfPlayer;
     }
 
-    public Long getNumberOfInitialDices() {
+    public int getNumberOfInitialDices() {
         return numberOfInitialDices;
     }
 
@@ -70,7 +72,7 @@ public class Match {
         this.totalDicesMatch = totalDicesMatch;
     }
 
-    public void setNumberOfInitialDices(Long numberOfInitialDices) {
+    public void setNumberOfInitialDices(int numberOfInitialDices) {
         this.numberOfInitialDices = numberOfInitialDices;
     }
 
@@ -88,5 +90,29 @@ public class Match {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public Player getFirstPlayer() {
+        return firstPlayer;
+    }
+
+    public void setFirstPlayer(Player firstPlayer) {
+        this.firstPlayer = firstPlayer;
+    }
+
+    public Bid getLastBid() {
+        return lastBid;
+    }
+
+    public void setLastBid(Bid lastBid) {
+        this.lastBid = lastBid;
+    }
+
+    public List<Bid> getBetHistory() {
+        return betHistory;
+    }
+
+    public void setBetHistory(List<Bid> betHistory) {
+        this.betHistory = betHistory;
     }
 }

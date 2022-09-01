@@ -5,36 +5,49 @@ import bagoh.game.application.dto.domainDto.Match;
 import bagoh.game.application.dto.domainDto.Player;
 import bagoh.game.application.dto.domainDto.Bid;
 import bagoh.game.application.service.MatchService;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class DefaultMatchService implements MatchService {
 
     private Match match;
-    private List<Player> players;
-    private List<Bid> betsHistory = new ArrayList<>();
-    private int totalDicesMatch;
 
-
-   // Neste construtor já recebemos o objeto Match, o qual conterá
-   // o id de cada jogador, e a quantidade inicial de dados de cada um.
-    public DefaultMatchService(Match match) {
-        this.match = match;
-        this.players = match.getPlayers();
-        this.totalDicesMatch = match.getTotalDicesMatch();
+    @Override
+    public Match inicializarPartida(List<Player> players, int totalDados) {
+        this.match = new Match(players.size(), totalDados);
+        match.setPlayers(players);
+        // repository salvando match no banco
+        return match;
     }
 
-    public void inicializarJogadores() {
-        Long numberOfPlayers = match.getNumberOfPlayer();
-
-        for (int i = 1; i <= numberOfPlayers; i++) {
-            String name = "Jogador-" + i;
-            Player player = new Player(match.getNumberOfInitialDices(), name);
-            player.setId(Long.valueOf(i));
-            players.add(player);
-        }
+    @Override
+    public List<Player> gerarDadosJogadores(boolean gerarPrimeiroDado) {
+        // Pra cada dado que cada jogador tiver, gerará um número aleatório de 1 a 6
+        // Se o parametro gerarPrimeiroDado for true:
+        // Gerar também um valor aleatório de 1 a 6 pra cada jogador
+        // Se mais do que um jogador tirar o mesmo valor, gerar outro valor pra esses jogadores
+        // Esses valores devem ser salvos no atributo primeiroDado de cada jogador
+        // retornar uma lista com os Players (preenchidos com os dados gerados)
+        // Se o parametro gerarPrimeiroDado for false, apenas gera os dados pros players.
+        return this.match.getPlayers();
     }
+
+    @Override
+    public String registrarAposta(Bid bid, Long idPlayer) {
+        return null;
+    }
+
+    @Override
+    public Match validarAposta(Long idJogador) {
+        return this.match;
+    }
+
+
+
+
 
     public Long fazerAposta(Long idJogador, Bid bid, String order) {
         System.out.println("Vez do jogador-" + idJogador);
@@ -49,6 +62,7 @@ public class DefaultMatchService implements MatchService {
     }
 
     public void printPlayers() {
+        List<Player> players = match.getPlayers();
         for (Player player : players) {
             System.out.println(player.getName());
         }
@@ -64,7 +78,7 @@ public class DefaultMatchService implements MatchService {
             bidValidation(bid, bidQuantity, bidType);
         }
         if (bid.isValid()) {
-            this.betsHistory.add(bid);
+            this.match.getBetHistory().add(bid);
             return getNextPlayer(idJogador, order);
         } else {
             return -1L;
@@ -77,7 +91,7 @@ public class DefaultMatchService implements MatchService {
         int sena = 6;
         int playerPosition = 0;
         boolean findPlayer = false;
-        for (Player player : players) {
+        for (Player player : match.getPlayers()) {
             if (player.getId() == idJogador) {
                 findPlayer = true;
                 break;
@@ -86,7 +100,7 @@ public class DefaultMatchService implements MatchService {
         }
         if (!findPlayer){
             bid.setInvalidReason("Jogador não identificado, id inexistente.");
-        }else if (bidQuantity > totalDicesMatch){
+        }else if (bidQuantity > match.getTotalDicesMatch()){
             bid.setInvalidReason("Aposta maior que a quantidade de dados na mesa.");
         } else if (bidQuantity <= 0 || bidType < bago || bidType > sena){
             bid.setInvalidReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.");
@@ -132,7 +146,7 @@ public class DefaultMatchService implements MatchService {
     private Bid getHigherBagoBid() {
         Bid higherBagoBid = new Bid(DiceValues.BAGO, 0, 0L);
         int bago = 1;
-        for (Bid bid : betsHistory) {
+        for (Bid bid : match.getBetHistory()) {
             int bidType = bid.getType().getNumericType();
             int bidQuantity = bid.getQuantity();
             if(bidType == 1 && bidQuantity > higherBagoBid.getQuantity()){
@@ -144,7 +158,7 @@ public class DefaultMatchService implements MatchService {
 
     private Bid getHigherNormalBid() {
         Bid higherNormalBid = new Bid(DiceValues.DUQUE, 0, 0L);
-        for (Bid bid : betsHistory) {
+        for (Bid bid : match.getBetHistory()) {
             int bidType = bid.getType().getNumericType();
             int bidQuantity = bid.getQuantity();
             if(bidType != 1 && bidQuantity >= higherNormalBid.getQuantity()){
@@ -160,76 +174,32 @@ public class DefaultMatchService implements MatchService {
     
     private Long getNextPlayer(Long idJogador,String order) {
         int playerPosition = 0;
-        for (Player player : players) {
+        for (Player player : match.getPlayers()) {
             if (player.getId() == idJogador) {
                 break;
             }
             playerPosition += 1;
         }
         if (order == "top-down" && playerPosition < match.getNumberOfPlayer() - 1) {
-            return players.get(playerPosition + 1).getId();
+            return match.getPlayers().get(playerPosition + 1).getId();
         } else if (order == "top-down") {
-            return players.get(0).getId();
+            return match.getPlayers().get(0).getId();
         } else if (order == "bottom-up" && playerPosition > 0) {
-            return players.get(playerPosition - 1).getId();
+            return match.getPlayers().get(playerPosition - 1).getId();
         } else {
-            return players.get(Math.toIntExact(match.getNumberOfPlayer() - 1L)).getId();
+            return match.getPlayers().get(Math.toIntExact(match.getNumberOfPlayer() - 1L)).getId();
         }
     }
 
     public void iniciarNovoTurno(){
-        this.betsHistory.clear();
-        this.totalDicesMatch = match.getTotalDicesMatch();
+        this.match.getBetHistory().clear();
         // gerarDadosProsPlayers (respeitando a quatde de dados de cada Player)
         // informar de quem é a vez ( quem perdeu dado recomeça o turno)
     }
 
 
-    @Override
-    public Match inicializarPartida() {
-        // TO-DO: chamar repository pra salvar Partida no banco
-        // TO-DO: Verifica se o Player.firstDice já está preenchido, se não:
-        //          Gerar um dado aleatório pra cada jogador
-        //          Se um jogador tirar um numero maior que os demais, ele é o primeiro
-        //          Neste caso, o método deve setar o Match.firstPlayer, e o Player.firstDice (dentro de Match)
-        //          Se dois jogadores tirarem o mesmo valor, seta apenas o Player.firstDice (de todos os players)
-        //        Se sim:
-        //          Gera apenas um dado aleatório novamente para os players que tinham o maior Player.firstDice
-        //          Se um jogador tirar um número maior que os demais, ele é o primeiro (setando o Match.firstPlayer)
-        //        Se não:
-        //          Seta apenas o Player.firstDice desses jogadores novamente
-        //
-        return this.match;
-    }
 
-    @Override
-    public void gerarDadosJogadores(List<Player> players) {
-        // TO-DO : Gerar Dados Jogaores
-        //         Ou seja, ver o total de dados de cada jogador, e gerar valores aleatorios de 1 a 6, pra cada jogador
-    }
 
-    @Override
-    public Long conduzirJogo() {
-        return null;
-    };
 
-    @Override
-    public List<Bid> registrarAposta() {
-        return null;
-    }
 
-    @Override
-    public boolean validarAposta(Long idJogador, Bid bid) {
-        return false;
-    }
-
-    @Override
-    public void removerDado(Long idPlayer) {
-
-    }
-
-    @Override
-    public Match consultarStatusPartida() {
-        return this.match;
-    }
 }
