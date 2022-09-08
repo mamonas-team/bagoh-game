@@ -3,7 +3,6 @@ package bagoh.game.application.service;
 import bagoh.game.application.dto.domainDto.Bid;
 import bagoh.game.application.dto.domainDto.Match;
 import bagoh.game.application.dto.domainDto.Player;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -34,18 +33,16 @@ public interface MatchService {
 
     /**
      * Este método é responsável por registrar as apostas que são feitas na partida.
-     * @param bid Aposta feita pelo idPlayer.
-     * @param idPlayer Player que fez a aposta.
-     * @return Retorna o status da Partida.
+     * @param bid aposta a ser validada.
+     * @return A aposta com sua validade atualizada e se for inválida com o motivo da invalidex no atributo invalidReason
      */
-    String registrarAposta(Bid bid, Long idPlayer);
+    Bid registrarAposta(Bid bid);
 
 
     /**
-     * Este método é responsável por validar uma aposta.
-     * @param idJogador
-     * @return Retorna true se a aposta é verdadeira, e false se é falsa.
+     * Este método é responsável por validar a última aposta.
+     * @return true se a aposta for verdadeira ou false caso contrario
      */
-    Match validarAposta(Long idJogador);
+    boolean duvidarAposta();
 
 }

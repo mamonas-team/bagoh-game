@@ -7,7 +7,6 @@ import bagoh.game.application.dto.domainDto.Bid;
 import bagoh.game.application.service.MatchService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,29 +35,26 @@ public class DefaultMatchService implements MatchService {
     }
 
     @Override
-    public String registrarAposta(Bid bid, Long idPlayer) {
-        return null;
+    public Bid registrarAposta(Bid bid) {
+        int bidQuantity = bid.getQuantity();
+        int bidType = bid.getType().getNumericType();
+
+        initialBidValidation(bid);
+        if (bid.isValid()){
+            bid.setValid(false);
+            bidValidation(bid);
+        }
+        if (bid.isValid()) {
+            this.match.getBetHistory().add(bid);
+            this.match.setLastBid(bid);
+        }
+        return bid;
     }
 
     @Override
-    public Match validarAposta(Long idJogador) {
-        return this.match;
-    }
-
-
-
-
-
-    public Long fazerAposta(Long idJogador, Bid bid, String order) {
-        System.out.println("Vez do jogador-" + idJogador);
-        Long proximo = makeBet(idJogador, bid, order);
-        if (bid.isValid()) {
-            System.out.println("aposta de "+bid.getQuantity()+" "+bid.getType()+" passou. O próximo jogador é jogador-"+proximo+"\n");
-            return proximo;
-        } else {
-            System.out.println(bid.getInvalidReason());
-            return proximo;
-        }
+    public boolean duvidarAposta() {
+        int[] dicesOfTurn = countDicesOnTurn();
+        return verificationOfBid(dicesOfTurn);
     }
 
     public void printPlayers() {
@@ -68,25 +64,59 @@ public class DefaultMatchService implements MatchService {
         }
     }
 
-    public Long makeBet(Long idJogador, Bid bid, String order) {
-        int bidQuantity = bid.getQuantity();
-        int bidType = bid.getType().getNumericType();
-
-        initialBidValidation(bid, bidQuantity, bidType, idJogador);
-        if (bid.isValid()){
-            bid.setValid(false);
-            bidValidation(bid, bidQuantity, bidType);
+//    public Long makeBet(Long idJogador, Bid bid, String order) {
+//        int bidQuantity = bid.getQuantity();
+//        int bidType = bid.getType().getNumericType();
+//
+//        initialBidValidation(bid, bidQuantity, bidType, idJogador);
+//        if (bid.isValid()){
+//            bid.setValid(false);
+//            bidValidation(bid, bidQuantity, bidType);
+//        }
+//        if (bid.isValid()) {
+//            this.match.getBetHistory().add(bid);
+//            return getNextPlayer(idJogador, order);
+//        } else {
+//            return -1L;
+//        }
+//
+//    }
+    private int[] countDicesOnTurn(){
+        int[] dicesOfTurn = new int[6];
+        for (Player player : match.getPlayers()){
+            dicesOfTurn += player.getDices().getDicesQuantities();
         }
-        if (bid.isValid()) {
-            this.match.getBetHistory().add(bid);
-            return getNextPlayer(idJogador, order);
-        } else {
-            return -1L;
-        }
-
     }
 
-    private void initialBidValidation(Bid bid, int bidQuantity, int bidType, Long idJogador) {
+    boolean verificationOfBid(int[] dicesOfTurn){
+        int bago = 1;
+        int bagoQuantity = dicesOfTurn[0];
+
+        Bid bid = match.getLastBid();
+        int bidType = bid.getType().getNumericType();
+        int bidQuantity = bid.getQuantity();
+        if (bidType == bago){
+            if (bidQuantity <= bagoQuantity){
+                bid.setValid(true);
+            } else {
+                bid.setValid(false);
+            }
+        } else {
+            if (dicesOfTurn[bidType-1] == 0){
+                bid.setValid(false);
+            }
+            else if (bidQuantity <= bagoQuantity+dicesOfTurn[bidType-1]){
+                bid.setValid(true);
+            } else {
+                bid.setValid(false);
+            }
+        }
+        return bid.isValid();
+    }
+    private void initialBidValidation(Bid bid) {
+        int bidQuantity = bid.getQuantity();
+        int bidType = bid.getType().getNumericType();
+        Long idJogador = bid.getIdPlayer();
         int bago = 1;
         int sena = 6;
         int playerPosition = 0;
@@ -109,7 +139,9 @@ public class DefaultMatchService implements MatchService {
         }
     }
 
-    private void bidValidation(Bid bid, int bidQuantity, int bidType) {
+    private void bidValidation(Bid bid) {
+        int bidQuantity = bid.getQuantity();
+        int bidType = bid.getType().getNumericType();
         Bid higherBagoBid = getHigherBagoBid();
         Bid higherNormalBid = getHigherNormalBid();
         int higherNormalBidQuantity = higherNormalBid.getQuantity();

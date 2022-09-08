@@ -63,7 +63,7 @@ public class Match {
     public int getTotalDicesMatch() {
         totalDicesMatch = 0;
         for (Player player : players){
-            totalDicesMatch += player.getNumberOfDices();
+            totalDicesMatch += player.getDices().getNumberOfDices();
         }
         return totalDicesMatch;
     }

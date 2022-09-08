@@ -5,16 +5,15 @@ import java.util.List;
 public class Player {
 
     private Long id;
-    private int numberOfDices;
     private String name;
-    private List<DiceValues> firstDice;
-    private DiceValues[] dices = new DiceValues[6]; // TO-DO - talvez seja vetor de int mesmo
+    private Dices dices;
     private boolean status = true;
 
     public Player(int numberOfDices, String name) {
-        this.numberOfDices = numberOfDices;
+        this.dices = new Dices(numberOfDices);
         this.name = name;
     }
+
 
     public Long getId() {
         return id;
@@ -22,14 +21,6 @@ public class Player {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public int getNumberOfDices() {
-        return numberOfDices;
-    }
-
-    public void setNumberOfDices(int numberOfDices) {
-        this.numberOfDices = numberOfDices;
     }
 
     public String getName() {
@@ -40,14 +31,13 @@ public class Player {
         this.name = name;
     }
 
-    public DiceValues[] getDices() {
+    public Dices getDices() {
         return dices;
     }
 
-    public void setDices(DiceValues[] dices) {
+    public void setDices(Dices dices) {
         this.dices = dices;
     }
-
     public boolean isStatus() {
         return status;
     }
