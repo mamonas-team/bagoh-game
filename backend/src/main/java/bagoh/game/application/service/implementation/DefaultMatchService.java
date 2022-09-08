@@ -65,6 +65,10 @@ public class DefaultMatchService implements MatchService {
     }
 
 //    public Long makeBet(Long idJogador, Bid bid, String order) {
+        // nao há necessidade de inicializar essas variaveis
+        // pois em todos os métodos que elas são passadas como parametro, o objeto bid tmb está sendo passado
+        // e consequentemente voce reduz o numero de parametros do método, o que é uma boa pratica
+        // idealmente métodos devem ter de 0 a 2 parametros
 //        int bidQuantity = bid.getQuantity();
 //        int bidType = bid.getType().getNumericType();
 //
@@ -81,6 +85,8 @@ public class DefaultMatchService implements MatchService {
 //        }
 //
 //    }
+
+    // esse método pode estar dentro de Match Ex: match.getTotalDices();
     private int[] countDicesOnTurn(){
         int[] dicesOfTurn = new int[6];
         for (Player player : match.getPlayers()){
@@ -114,6 +120,8 @@ public class DefaultMatchService implements MatchService {
         return bid.isValid();
     }
     private void initialBidValidation(Bid bid) {
+        // todo: extrair essa parte num método playerValidation();
+        // daqui,
         int bidQuantity = bid.getQuantity();
         int bidType = bid.getType().getNumericType();
         Long idJogador = bid.getIdPlayer();
@@ -126,10 +134,17 @@ public class DefaultMatchService implements MatchService {
                 findPlayer = true;
                 break;
             }
+            // não iremos mais controlar posição (sentido da roda)
             playerPosition += 1;
         }
-        if (!findPlayer){
+        if (!findPlayer) {
             bid.setInvalidReason("Jogador não identificado, id inexistente.");
+
+        // até aqui.
+        // se voce adicionar uma chave fechando o if de cima, e selecionar tôdo o código (l125 - l142 [includindo a chave fechando o if])
+        // e clicar com botão direito -> refactor -> extract method, o intelliJ faz isso pra voce
+
+
         }else if (bidQuantity > match.getTotalDicesMatch()){
             bid.setInvalidReason("Aposta maior que a quantidade de dados na mesa.");
         } else if (bidQuantity <= 0 || bidType < bago || bidType > sena){
@@ -144,10 +159,17 @@ public class DefaultMatchService implements MatchService {
         int bidType = bid.getType().getNumericType();
         Bid higherBagoBid = getHigherBagoBid();
         Bid higherNormalBid = getHigherNormalBid();
+
         int higherNormalBidQuantity = higherNormalBid.getQuantity();
         int higherNormalBidType = higherNormalBid.getType().getNumericType();
         int higherBagoBidQuantity = higherBagoBid.getQuantity();
+
+        // todo: adicionar comentários nesses ifs/else indicando qual situação está sendo validada
         if (higherNormalBidQuantity == 2*higherBagoBidQuantity){
+            // usar a chave (no caso nome dos dados) do enum, ao invés do valor (1), deixa o código mais compreensível
+            // Ex: if(bid.getType() == DiceValues.BAGO && bid.getQuantity() > higherBagoBidQuantity)
+            // ou ainda melhor, extrair numa váriável booleana Ex: boolean bidIsBago = bid.getType() == DiceValues.BAGO;
+            // dai o If ficaria :  if (bidIsBago && bidQuantity > higherBagoBidQuantity){
             if (bidType == 1 && bidQuantity > higherBagoBidQuantity){
                 bid.setValid(true);
             } else if (bidType > higherNormalBidType && bidQuantity >= higherNormalBidQuantity) {
@@ -177,10 +199,12 @@ public class DefaultMatchService implements MatchService {
 
     private Bid getHigherBagoBid() {
         Bid higherBagoBid = new Bid(DiceValues.BAGO, 0, 0L);
-        int bago = 1;
+        // se colocar o mouse em cima da variavel abaixo verá que ela não está sendo utilizada
+        int bago = 1; // Repare que ela fica até em cinza, isso é o Intellij tentando te ajudar
         for (Bid bid : match.getBetHistory()) {
             int bidType = bid.getType().getNumericType();
             int bidQuantity = bid.getQuantity();
+            // aqui tambem pode criar a variavel bidIsBago
             if(bidType == 1 && bidQuantity > higherBagoBid.getQuantity()){
                 higherBagoBid = bid;
             }
@@ -189,6 +213,10 @@ public class DefaultMatchService implements MatchService {
     }
 
     private Bid getHigherNormalBid() {
+        // este método pode ser refatorado:
+        // como as apostas sempre aumentam, o ultimo elemento da lista será a maior aposta
+        // basta apenas manter a condição pra desconsiderar caso a aposta seja em bago
+        // pois já tem outro método que identifica a maior aposta em bago
         Bid higherNormalBid = new Bid(DiceValues.DUQUE, 0, 0L);
         for (Bid bid : match.getBetHistory()) {
             int bidType = bid.getType().getNumericType();
@@ -203,7 +231,8 @@ public class DefaultMatchService implements MatchService {
         }
         return higherNormalBid;
     }
-    
+
+    // este método não será mais de responsabilidade do back e sim do front
     private Long getNextPlayer(Long idJogador,String order) {
         int playerPosition = 0;
         for (Player player : match.getPlayers()) {
