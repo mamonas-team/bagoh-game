@@ -5,8 +5,9 @@ public class Bid {
     private DiceValues type;
     private int quantity;
     private Long idPlayer;
-    private boolean valid = false;
-    private String invalidReason = "";
+    private boolean registered = false;
+    private String unregisteredReason = "";
+    private boolean valid;
 
     public Bid(DiceValues type, int quantity, Long idPlayer) {
         this.type = type;
@@ -39,19 +40,27 @@ public class Bid {
         this.idPlayer = idPlayer;
     }
 
+    public boolean isRegistered() {
+        return registered;
+    }
+
+    public void setRegistered(boolean registered) {
+        this.registered = registered;
+    }
+
+    public String getUnregisteredReason() {
+        return unregisteredReason;
+    }
+
+    public void setUnregisteredReason(String unregisteredReason) {
+        this.unregisteredReason = unregisteredReason;
+    }
+
     public boolean isValid() {
         return valid;
     }
 
     public void setValid(boolean valid) {
         this.valid = valid;
-    }
-
-    public String getInvalidReason() {
-        return invalidReason;
-    }
-
-    public void setInvalidReason(String invalidReason) {
-        this.invalidReason = invalidReason;
     }
 }

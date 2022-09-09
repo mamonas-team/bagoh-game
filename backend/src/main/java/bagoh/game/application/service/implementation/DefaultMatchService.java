@@ -39,12 +39,12 @@ public class DefaultMatchService implements MatchService {
         int bidQuantity = bid.getQuantity();
         int bidType = bid.getType().getNumericType();
 
-        initialBidValidation(bid);
-        if (bid.isValid()){
-            bid.setValid(false);
-            bidValidation(bid);
+        initialValidationOfBidRegistration(bid);
+        if (bid.isRegistered()){
+            bid.setRegistered(false);
+            ValidationOfBidRegistration(bid);
         }
-        if (bid.isValid()) {
+        if (bid.isRegistered()) {
             this.match.getBetHistory().add(bid);
             this.match.setLastBid(bid);
         }
@@ -52,8 +52,8 @@ public class DefaultMatchService implements MatchService {
     }
 
     @Override
-    public boolean duvidarAposta() {
-        int[] dicesOfTurn = countDicesOnTurn();
+    public boolean validarAposta() {
+        int[] dicesOfTurn = countDicesInTurn();
         return verificationOfBid(dicesOfTurn);
     }
 
@@ -64,28 +64,15 @@ public class DefaultMatchService implements MatchService {
         }
     }
 
-//    public Long makeBet(Long idJogador, Bid bid, String order) {
-//        int bidQuantity = bid.getQuantity();
-//        int bidType = bid.getType().getNumericType();
-//
-//        initialBidValidation(bid, bidQuantity, bidType, idJogador);
-//        if (bid.isValid()){
-//            bid.setValid(false);
-//            bidValidation(bid, bidQuantity, bidType);
-//        }
-//        if (bid.isValid()) {
-//            this.match.getBetHistory().add(bid);
-//            return getNextPlayer(idJogador, order);
-//        } else {
-//            return -1L;
-//        }
-//
-//    }
-    private int[] countDicesOnTurn(){
+    private int[] countDicesInTurn(){
         int[] dicesOfTurn = new int[6];
         for (Player player : match.getPlayers()){
-            dicesOfTurn += player.getDices().getDicesQuantities();
+            int[] dicesQuantities = player.getDices().getDicesQuantities();
+            for (int i=0; i<dicesQuantities.length; i++){
+                dicesOfTurn[i] += dicesQuantities[i];
+            }
         }
+        return dicesOfTurn;
     }
 
     boolean verificationOfBid(int[] dicesOfTurn){
@@ -113,7 +100,7 @@ public class DefaultMatchService implements MatchService {
         }
         return bid.isValid();
     }
-    private void initialBidValidation(Bid bid) {
+    private void initialValidationOfBidRegistration(Bid bid) {
         int bidQuantity = bid.getQuantity();
         int bidType = bid.getType().getNumericType();
         Long idJogador = bid.getIdPlayer();
@@ -129,17 +116,17 @@ public class DefaultMatchService implements MatchService {
             playerPosition += 1;
         }
         if (!findPlayer){
-            bid.setInvalidReason("Jogador não identificado, id inexistente.");
+            bid.setUnregisteredReason("Jogador não identificado, id inexistente.");
         }else if (bidQuantity > match.getTotalDicesMatch()){
-            bid.setInvalidReason("Aposta maior que a quantidade de dados na mesa.");
+            bid.setUnregisteredReason("Aposta maior que a quantidade de dados na mesa.");
         } else if (bidQuantity <= 0 || bidType < bago || bidType > sena){
-            bid.setInvalidReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.");
+            bid.setUnregisteredReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.");
         } else {
-            bid.setValid(true);
+            bid.setRegistered(true);
         }
     }
 
-    private void bidValidation(Bid bid) {
+    private void ValidationOfBidRegistration(Bid bid) {
         int bidQuantity = bid.getQuantity();
         int bidType = bid.getType().getNumericType();
         Bid higherBagoBid = getHigherBagoBid();
@@ -149,29 +136,29 @@ public class DefaultMatchService implements MatchService {
         int higherBagoBidQuantity = higherBagoBid.getQuantity();
         if (higherNormalBidQuantity == 2*higherBagoBidQuantity){
             if (bidType == 1 && bidQuantity > higherBagoBidQuantity){
-                bid.setValid(true);
+                bid.setRegistered(true);
             } else if (bidType > higherNormalBidType && bidQuantity >= higherNormalBidQuantity) {
-                bid.setValid(true);
+                bid.setRegistered(true);
             } else if (bidType <= higherNormalBidType && bidQuantity > higherNormalBidQuantity) {
-                bid.setValid(true);
+                bid.setRegistered(true);
             }
         } else if (higherNormalBidQuantity > 2*higherBagoBidQuantity) {
             if (bidType == 1 && bidQuantity >= Math.ceil(higherNormalBidQuantity/2)){
-                bid.setValid(true);
+                bid.setRegistered(true);
             } else if (bidType > higherNormalBidType && bidQuantity >= higherNormalBidQuantity) {
-                bid.setValid(true);
+                bid.setRegistered(true);
             } else if (bidType <= higherNormalBidType && bidQuantity > higherNormalBidQuantity) {
-                bid.setValid(true);
+                bid.setRegistered(true);
             }
         } else if (higherNormalBidQuantity < 2*higherBagoBidQuantity) {
             if (bidType == 1 && bidQuantity > higherBagoBidQuantity){
-                bid.setValid(true);
+                bid.setRegistered(true);
             } else if (bidType != 1 && bidQuantity >= 2* higherBagoBidQuantity) {
-                bid.setValid(true);
+                bid.setRegistered(true);
             }
         }
-        if(!bid.isValid()){
-            bid.setInvalidReason("Aposta inválida. O valor apostado não é maior que a última aposta ou já foi utilizado.");
+        if(!bid.isRegistered()){
+            bid.setUnregisteredReason("Aposta inválida. O valor apostado não é maior que a última aposta ou já foi utilizado.");
         }
     }
 
@@ -223,15 +210,10 @@ public class DefaultMatchService implements MatchService {
         }
     }
 
-    public void iniciarNovoTurno(){
+    public void iniciarNovoTurno() {
         this.match.getBetHistory().clear();
+        this.match.getTotalDicesMatch();
         // gerarDadosProsPlayers (respeitando a quatde de dados de cada Player)
         // informar de quem é a vez ( quem perdeu dado recomeça o turno)
     }
-
-
-
-
-
-
 }
