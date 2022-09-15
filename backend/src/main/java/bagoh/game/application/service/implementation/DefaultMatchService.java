@@ -216,4 +216,8 @@ public class DefaultMatchService implements MatchService {
         // gerarDadosProsPlayers (respeitando a quatde de dados de cada Player)
         // informar de quem é a vez ( quem perdeu dado recomeça o turno)
     }
+
+    public Match getMatch() {
+        return match;
+    }
 }
