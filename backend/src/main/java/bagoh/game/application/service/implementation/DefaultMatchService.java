@@ -36,10 +36,11 @@ public class DefaultMatchService implements MatchService {
 
     @Override
     public Bid registrarAposta(Bid bid) {
-        int bidQuantity = bid.getQuantity();
-        int bidType = bid.getType().getNumericType();
-
-        initialValidationOfBidRegistration(bid);
+        playerValidation(bid);
+        if (bid.isRegistered()) {
+            bid.setRegistered(false);
+            initialValidationOfBidRegistration(bid);
+        }
         if (bid.isRegistered()){
             bid.setRegistered(false);
             ValidationOfBidRegistration(bid);
@@ -53,7 +54,7 @@ public class DefaultMatchService implements MatchService {
 
     @Override
     public boolean validarAposta() {
-        int[] dicesOfTurn = countDicesInTurn();
+        int[] dicesOfTurn = match.countDicesInTurn();
         return verificationOfBid(dicesOfTurn);
     }
 
@@ -62,17 +63,6 @@ public class DefaultMatchService implements MatchService {
         for (Player player : players) {
             System.out.println(player.getName());
         }
-    }
-
-    private int[] countDicesInTurn(){
-        int[] dicesOfTurn = new int[6];
-        for (Player player : match.getPlayers()){
-            int[] dicesQuantities = player.getDices().getDicesQuantities();
-            for (int i=0; i<dicesQuantities.length; i++){
-                dicesOfTurn[i] += dicesQuantities[i];
-            }
-        }
-        return dicesOfTurn;
     }
 
     boolean verificationOfBid(int[] dicesOfTurn){
@@ -100,9 +90,8 @@ public class DefaultMatchService implements MatchService {
         }
         return bid.isValid();
     }
-    private void initialValidationOfBidRegistration(Bid bid) {
-        int bidQuantity = bid.getQuantity();
-        int bidType = bid.getType().getNumericType();
+
+    private void playerValidation(Bid bid) {
         Long idJogador = bid.getIdPlayer();
         int bago = 1;
         int sena = 6;
@@ -115,9 +104,18 @@ public class DefaultMatchService implements MatchService {
             }
             playerPosition += 1;
         }
-        if (!findPlayer){
+        if (!findPlayer) {
             bid.setUnregisteredReason("Jogador não identificado, id inexistente.");
-        }else if (bidQuantity > match.getTotalDicesMatch()){
+        } else {
+            bid.setRegistered(true);
+        }
+    }
+    private void initialValidationOfBidRegistration(Bid bid) {
+        int bidQuantity = bid.getQuantity();
+        int bidType = bid.getType().getNumericType();
+        int bago = 1;
+        int sena = 6;
+        if (bidQuantity > match.getTotalDicesMatch()){
             bid.setUnregisteredReason("Aposta maior que a quantidade de dados na mesa.");
         } else if (bidQuantity <= 0 || bidType < bago || bidType > sena){
             bid.setUnregisteredReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.");
@@ -129,31 +127,91 @@ public class DefaultMatchService implements MatchService {
     private void ValidationOfBidRegistration(Bid bid) {
         int bidQuantity = bid.getQuantity();
         int bidType = bid.getType().getNumericType();
-        Bid higherBagoBid = getHigherBagoBid();
-        Bid higherNormalBid = getHigherNormalBid();
+        boolean bidIsBago = bid.getType() == DiceValues.BAGO;
+        Bid higherBagoBid = getHigherBagoBid(); //Maior aposta envolvendo bagos no turno
+        Bid higherNormalBid = getHigherNormalBid(); //Maior aposta não envolvendo bagos (normal) no turno
+
         int higherNormalBidQuantity = higherNormalBid.getQuantity();
         int higherNormalBidType = higherNormalBid.getType().getNumericType();
         int higherBagoBidQuantity = higherBagoBid.getQuantity();
+
         if (higherNormalBidQuantity == 2*higherBagoBidQuantity){
-            if (bidType == 1 && bidQuantity > higherBagoBidQuantity){
+            /*
+            Se a quantidade de dados na maior aposta normal é exatamente o dobro da quantidade de dados na
+            maior aposta de bagos (por exemplo: 3 BAGOS e 6 QUINAS)
+             */
+            if (bidIsBago && bidQuantity > higherBagoBidQuantity){
+                /*
+                A aposta a ser registrada:
+                    - É em BAGOS;
+                    - Ela tem mais BAGOS que na maior aposta de BAGOS.
+                 */
                 bid.setRegistered(true);
             } else if (bidType > higherNormalBidType && bidQuantity >= higherNormalBidQuantity) {
+                /*
+                A aposta a ser registrada:
+                    - É normal mas em um valor "maior" que o da maior aposta normal (por exemplo: a
+                aposta a ser registrada é em SENA e a maior aposta normal em QUADRA);
+                    - Tem o número de dados maior ou igual que o da maior aposta normal.
+                 */
                 bid.setRegistered(true);
             } else if (bidType <= higherNormalBidType && bidQuantity > higherNormalBidQuantity) {
+                /*
+                A aposta a ser registrada:
+                    - É normal mas em um valor "menor ou igual" que o da maior aposta normal (por exemplo: a
+                aposta a ser registrada é em DUQUE e a maior aposta normal em QUINA);
+                    - Tem o número de dados maior que o da maior aposta normal.
+                 */
                 bid.setRegistered(true);
             }
         } else if (higherNormalBidQuantity > 2*higherBagoBidQuantity) {
-            if (bidType == 1 && bidQuantity >= Math.ceil(higherNormalBidQuantity/2)){
+            /*
+            Se a quantidade de dados na maior aposta normal é maior que o dobro da quantidade de dados na
+            maior aposta de bagos (por exemplo: 3 BAGOS e 7 QUINAS)
+             */
+            if (bidIsBago && bidQuantity >= Math.ceil(higherNormalBidQuantity/2)){
+                /*
+                A aposta a ser registrada:
+                    - É em BAGOS;
+                    - O dobro da quantidade de dados na aposta a ser registrado é maior ou igual à quantidade de dados
+                    na maior aposta (por exemplo: 4 BAGOS e 8 SENAS, 5 BAGOS e 9 QUADRAS).
+                 */
                 bid.setRegistered(true);
             } else if (bidType > higherNormalBidType && bidQuantity >= higherNormalBidQuantity) {
+                 /*
+                A aposta a ser registrada:
+                    - É normal mas em um valor "maior" que o da maior aposta normal (por exemplo: a
+                aposta a ser registrada é em SENA e a maior aposta normal em QUADRA);
+                    - Tem o número de dados maior ou igual que o da maior aposta normal.
+                 */
                 bid.setRegistered(true);
             } else if (bidType <= higherNormalBidType && bidQuantity > higherNormalBidQuantity) {
+                /*
+                A aposta a ser registrada:
+                    - É normal mas em um valor "menor ou igual" que o da maior aposta normal (por exemplo: a
+                aposta a ser registrada é em DUQUE e a maior aposta normal em QUINA);
+                    - Tem o número de dados maior que o da maior aposta normal.
+                 */
                 bid.setRegistered(true);
             }
         } else if (higherNormalBidQuantity < 2*higherBagoBidQuantity) {
-            if (bidType == 1 && bidQuantity > higherBagoBidQuantity){
+            /*
+            Se a quantidade de dados na maior aposta normal é menor que o dobro da quantidade de dados na
+            maior aposta de bagos (por exemplo: 5 BAGOS e 4 QUINAS)
+             */
+            if (bidIsBago && bidQuantity > higherBagoBidQuantity){
+                /*
+                A aposta a ser registrada:
+                    - É em BAGOS;
+                    - Ela tem mais BAGOS que na maior aposta de BAGOS.
+                 */
                 bid.setRegistered(true);
-            } else if (bidType != 1 && bidQuantity >= 2* higherBagoBidQuantity) {
+            } else if (!bidIsBago && bidQuantity >= 2* higherBagoBidQuantity) {
+                /*
+                A aposta a ser registrada:
+                    - É normal;
+                    - Ela tem mais ou igual número de dados que o da maior aposta de BAGOS.
+                 */
                 bid.setRegistered(true);
             }
         }
@@ -164,11 +222,10 @@ public class DefaultMatchService implements MatchService {
 
     private Bid getHigherBagoBid() {
         Bid higherBagoBid = new Bid(DiceValues.BAGO, 0, 0L);
-        int bago = 1;
         for (Bid bid : match.getBetHistory()) {
-            int bidType = bid.getType().getNumericType();
             int bidQuantity = bid.getQuantity();
-            if(bidType == 1 && bidQuantity > higherBagoBid.getQuantity()){
+            boolean bidIsBago = bid.getType() == DiceValues.BAGO;
+            if(bidIsBago && bidQuantity > higherBagoBid.getQuantity()){
                 higherBagoBid = bid;
             }
         }
@@ -178,37 +235,32 @@ public class DefaultMatchService implements MatchService {
     private Bid getHigherNormalBid() {
         Bid higherNormalBid = new Bid(DiceValues.DUQUE, 0, 0L);
         for (Bid bid : match.getBetHistory()) {
-            int bidType = bid.getType().getNumericType();
-            int bidQuantity = bid.getQuantity();
-            if(bidType != 1 && bidQuantity >= higherNormalBid.getQuantity()){
-                if (bidQuantity > higherNormalBid.getQuantity()){
-                    higherNormalBid = bid;
-                } else if (bidType > higherNormalBid.getType().getNumericType()) {
-                    higherNormalBid = bid;
-                }
+            boolean bidIsBago = bid.getType() == DiceValues.BAGO;
+            if(!bidIsBago){
+                higherNormalBid = bid;
             }
         }
         return higherNormalBid;
     }
     
-    private Long getNextPlayer(Long idJogador,String order) {
-        int playerPosition = 0;
-        for (Player player : match.getPlayers()) {
-            if (player.getId() == idJogador) {
-                break;
-            }
-            playerPosition += 1;
-        }
-        if (order == "top-down" && playerPosition < match.getNumberOfPlayer() - 1) {
-            return match.getPlayers().get(playerPosition + 1).getId();
-        } else if (order == "top-down") {
-            return match.getPlayers().get(0).getId();
-        } else if (order == "bottom-up" && playerPosition > 0) {
-            return match.getPlayers().get(playerPosition - 1).getId();
-        } else {
-            return match.getPlayers().get(Math.toIntExact(match.getNumberOfPlayer() - 1L)).getId();
-        }
-    }
+//    private Long getNextPlayer(Long idJogador,String order) {
+//        int playerPosition = 0;
+//        for (Player player : match.getPlayers()) {
+//            if (player.getId() == idJogador) {
+//                break;
+//            }
+//            playerPosition += 1;
+//        }
+//        if (order == "top-down" && playerPosition < match.getNumberOfPlayer() - 1) {
+//            return match.getPlayers().get(playerPosition + 1).getId();
+//        } else if (order == "top-down") {
+//            return match.getPlayers().get(0).getId();
+//        } else if (order == "bottom-up" && playerPosition > 0) {
+//            return match.getPlayers().get(playerPosition - 1).getId();
+//        } else {
+//            return match.getPlayers().get(Math.toIntExact(match.getNumberOfPlayer() - 1L)).getId();
+//        }
+//    }
 
     public void iniciarNovoTurno() {
         this.match.getBetHistory().clear();

@@ -24,6 +24,17 @@ public class Match {
         this.numberOfInitialDices = numberOfInitialDices;
     }
 
+    public int[] countDicesInTurn(){
+        int[] dicesOfTurn = new int[6];
+        for (Player player : players){
+            int[] dicesQuantities = player.getDices().getDicesQuantities();
+            for (int i=0; i<dicesQuantities.length; i++){
+                dicesOfTurn[i] += dicesQuantities[i];
+            }
+        }
+        return dicesOfTurn;
+    }
+
     public Date getStartDate() {
         return startDate;
     }
