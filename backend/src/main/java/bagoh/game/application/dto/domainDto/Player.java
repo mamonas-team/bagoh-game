@@ -7,8 +7,8 @@ public class Player {
     private Long id;
     private int numberOfDices;
     private String name;
-    private List<DiceValues> firstDice;
-    private DiceValues[] dices = new DiceValues[6]; // TO-DO - talvez seja vetor de int mesmo
+    private int firstDice;
+    private int[] dices = new int[6]; // TO-DO - talvez seja vetor de int mesmo
     private boolean status = true;
 
     public Player(int numberOfDices, String name) {
@@ -40,11 +40,11 @@ public class Player {
         this.name = name;
     }
 
-    public DiceValues[] getDices() {
+    public int[] getDices() {
         return dices;
     }
 
-    public void setDices(DiceValues[] dices) {
+    public void setDices(int[] dices) {
         this.dices = dices;
     }
 
@@ -54,5 +54,18 @@ public class Player {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public void addDiceValues(int dicesValues){
+        dices[dicesValues - 1] =+ 1;
+
+    }
+
+    public int getFirstDice() {
+        return firstDice;
+    }
+
+    public void setFirstDice(int firstDice) {
+        this.firstDice = firstDice;
     }
 }

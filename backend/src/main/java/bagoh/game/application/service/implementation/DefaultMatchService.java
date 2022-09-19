@@ -7,8 +7,10 @@ import bagoh.game.application.dto.domainDto.Bid;
 import bagoh.game.application.service.MatchService;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class DefaultMatchService implements MatchService {
@@ -25,14 +27,38 @@ public class DefaultMatchService implements MatchService {
 
     @Override
     public List<Player> gerarDadosJogadores(boolean gerarPrimeiroDado) {
-        // Pra cada dado que cada jogador tiver, gerará um número aleatório de 1 a 6
-        // Se o parametro gerarPrimeiroDado for true:
-        // Gerar também um valor aleatório de 1 a 6 pra cada jogador
-        // Se mais do que um jogador tirar o mesmo valor, gerar outro valor pra esses jogadores
-        // Esses valores devem ser salvos no atributo primeiroDado de cada jogador
-        // retornar uma lista com os Players (preenchidos com os dados gerados)
-        // Se o parametro gerarPrimeiroDado for false, apenas gera os dados pros players.
-        return this.match.getPlayers();
+        List<Player> playerList = match.getPlayers();
+
+        for (Player player : playerList) {
+
+            Random dices = new Random(); // instanciada classe Random
+            player.addDiceValues(dices.nextInt(6) + 1); //gerando dados de 1 a 6
+
+            int[] dadosAleatorios = new int[6];
+
+            for (int numDado = 1; numDado < player.getNumberOfDices() + 1 ; numDado++) {
+
+                int dadoGerado = dices.nextInt(6) + 1;
+                dadosAleatorios[dadoGerado - 1] = dadosAleatorios[dadoGerado - 1] + 1;
+
+            }
+
+            player.setDices(dadosAleatorios);
+
+
+            if (gerarPrimeiroDado) {
+//quando esse parametro for verdadeiro tem que gerar os dados de todos os players (player.dices) e também gerar o primeiro dado (player.firstLongDices)
+                for (Player pdplayer : playerList) {
+
+                    Random firstdice = new Random();
+                    pdplayer.setFirstDice(firstdice.nextInt(6) + 1);
+
+                }
+
+
+            }
+        }
+        return null;
     }
 
     @Override
@@ -65,6 +91,11 @@ public class DefaultMatchService implements MatchService {
         List<Player> players = match.getPlayers();
         for (Player player : players) {
             System.out.println(player.getName());
+            for(int i = 0 ; i < 6 ; i++){
+                int numberOfDices = player.getDices()[i];
+                System.out.print(numberOfDices+" ");
+            }
+            System.out.println("\n Primeiro Dado " + player.getFirstDice());
         }
     }
 
