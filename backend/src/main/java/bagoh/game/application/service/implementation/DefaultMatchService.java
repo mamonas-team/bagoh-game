@@ -37,26 +37,21 @@ public class DefaultMatchService implements MatchService {
     @Override
     public Bid registrarAposta(Bid bid) {
         playerValidation(bid);
-        if (bid.isRegistered()) {
-            bid.setRegistered(false);
-            initialValidationOfBidRegistration(bid);
-        }
-        if (bid.isRegistered()){
-            bid.setRegistered(false);
-            ValidationOfBidRegistration(bid);
-        }
-        if (bid.isRegistered()) {
-            this.match.getBetHistory().add(bid);
-            this.match.setLastBid(bid);
-        }
+        initialValidationOfBidRegistration(bid);
+        validationOfBidRegistration(bid);
+        this.match.getBetHistory().add(bid);
+        this.match.setLastBid(bid);
         return bid;
     }
 
     @Override
-    public boolean validarAposta() {
+    public Match validarAposta() {
         int[] dicesOfTurn = match.countDicesInTurn();
-        return verificationOfBid(dicesOfTurn);
+        return this.match;
+        //return verificationOfBid(dicesOfTurn);
     }
+
+
 
     public void printPlayers() {
         List<Player> players = match.getPlayers();
@@ -93,24 +88,23 @@ public class DefaultMatchService implements MatchService {
 
     private void playerValidation(Bid bid) {
         Long idJogador = bid.getIdPlayer();
-        int bago = 1;
-        int sena = 6;
-        int playerPosition = 0;
+
         boolean findPlayer = false;
+
         for (Player player : match.getPlayers()) {
             if (player.getId() == idJogador) {
                 findPlayer = true;
+                bid.setValid(true);
                 break;
             }
-            playerPosition += 1;
         }
+
         if (!findPlayer) {
             bid.setUnregisteredReason("Jogador não identificado, id inexistente.");
-        } else {
-            bid.setRegistered(true);
         }
+
     }
-    private void initialValidationOfBidRegistration(Bid bid) {
+    private Match initialValidationOfBidRegistration(Bid bid) {
         int bidQuantity = bid.getQuantity();
         int bidType = bid.getType().getNumericType();
         int bago = 1;
@@ -122,9 +116,11 @@ public class DefaultMatchService implements MatchService {
         } else {
             bid.setRegistered(true);
         }
+
+        return this.match;
     }
 
-    private void ValidationOfBidRegistration(Bid bid) {
+    private void validationOfBidRegistration(Bid bid) {
         int bidQuantity = bid.getQuantity();
         int bidType = bid.getType().getNumericType();
         boolean bidIsBago = bid.getType() == DiceValues.BAGO;
