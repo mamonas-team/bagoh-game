@@ -2,26 +2,27 @@ package bagoh.game.application.dto.domainDto;
 
 public class Bid {
 
-    private DiceValues type;
+    private DiceValues value;
     private int quantity;
     private Long idPlayer;
-    private boolean registered = false;
-    private String unregisteredReason = "";
-    private boolean valid;
+    private boolean isAllowed;
+    private boolean isTrue;
+    private String unallowedBidReason = "";
+
 
     public Bid(DiceValues type, int quantity, Long idPlayer) {
-        this.type = type;
+        this.value = type;
         this.quantity = quantity;
         this.idPlayer = idPlayer;
 
     }
 
-    public DiceValues getType() {
-        return type;
+    public DiceValues getValue() {
+        return value;
     }
 
-    public void setType(DiceValues type) {
-        this.type = type;
+    public void setValue(DiceValues value) {
+        this.value = value;
     }
 
     public int getQuantity() {
@@ -40,27 +41,27 @@ public class Bid {
         this.idPlayer = idPlayer;
     }
 
-    public boolean isRegistered() {
-        return registered;
+    public String getUnallowedBidReason() {
+        return unallowedBidReason;
     }
 
-    public void setRegistered(boolean registered) {
-        this.registered = registered;
+    public void setUnallowedBidReason(String unallowedBidReason) {
+        this.unallowedBidReason = unallowedBidReason;
     }
 
-    public String getUnregisteredReason() {
-        return unregisteredReason;
+    public boolean isAllowed() {
+        return isAllowed;
     }
 
-    public void setUnregisteredReason(String unregisteredReason) {
-        this.unregisteredReason = unregisteredReason;
+    public void setAllowed(boolean allowed) {
+        this.isAllowed = allowed;
     }
 
-    public boolean isValid() {
-        return valid;
+    public boolean isTrue() {
+        return isTrue;
     }
 
-    public void setValid(boolean valid) {
-        this.valid = valid;
+    public void setTrue(boolean aTrue) {
+        isTrue = aTrue;
     }
 }

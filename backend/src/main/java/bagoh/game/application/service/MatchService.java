@@ -43,6 +43,6 @@ public interface MatchService {
      * Este método é responsável por validar a última aposta.
      * @return true se a aposta for verdadeira ou false caso contrario
      */
-    Match validarAposta();
+    Boolean validarAposta();
 
 }
