@@ -1,13 +1,20 @@
 package bagoh.game.application.dto.domainDto;
 
+import java.util.List;
+
 public class Dices {
 
     private int numberOfDices;
-    private DiceValues fightDice;
+    private List<DiceValues> fightDice;
     private int[] dicesQuantities = new int[6]; //[bagos,duques,ternas,quadras,quinas,senas]
 
     public Dices(int numberOfDices) {
         this.numberOfDices = numberOfDices;
+    }
+
+    public void resetDices() {
+        this.dicesQuantities = new int[6];
+        this.fightDice.clear();
     }
 
     public int getNumberOfDices() {
@@ -18,12 +25,8 @@ public class Dices {
         this.numberOfDices = numberOfDices;
     }
 
-    public DiceValues getFightDice() {
+    public List<DiceValues> getFightDice() {
         return fightDice;
-    }
-
-    public void setFightDice(DiceValues fightDice) {
-        this.fightDice = fightDice;
     }
 
     public int[] getDicesQuantities() {

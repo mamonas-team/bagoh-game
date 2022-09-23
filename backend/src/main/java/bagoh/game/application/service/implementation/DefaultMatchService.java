@@ -94,89 +94,88 @@ public class DefaultMatchService implements MatchService {
     }
 
     private void basicAllowedBidValidation(Bid bid) {
-        int bidQuantity = bid.getQuantity();
-        int bidType = bid.getValue().getNumericType();
-        int bago = 1;
-        int sena = 6;
+        if (bid.isAllowed()) {
+            int bidQuantity = bid.getQuantity();
+            int bidType = bid.getValue().getNumericType();
+            int bago = 1;
+            int sena = 6;
 
-        bid.setAllowed(false);
+            bid.setAllowed(false);
 
-        if (bidQuantity > match.getTotalDicesMatch()){
-            bid.setUnallowedBidReason("Aposta maior que a quantidade de dados na mesa.");
-        } else if (bidQuantity <= 0 || bidType < bago || bidType > sena){
-            bid.setUnallowedBidReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.");
-        } else {
-            bid.setAllowed(true);
+            if (bidQuantity > match.getTotalDicesMatch()){
+                bid.setUnallowedBidReason("Aposta maior que a quantidade de dados na mesa.");
+            } else if (bidQuantity <= 0 || bidType < bago || bidType > sena){
+                bid.setUnallowedBidReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.");
+            } else {
+                bid.setAllowed(true);
+            }
         }
     }
 
     private void completeAllowedBidValidation(Bid bid) {
-        int bidQuantity = bid.getQuantity();
-        int bidType = bid.getValue().getNumericType();
-        boolean bidIsBago = bid.getValue() == DiceValues.BAGO;
-        Bid lastBagoBid = getLastBagoBid(); // Ultima (maior) aposta em bago
-        Bid lastNormalBid = getLastNormalBid(); // Ultima (maior) aposta sem ser em bago (normal)
+        if (bid.isAllowed()) {
+            int bidQuantity = bid.getQuantity();
+            int bidType = bid.getValue().getNumericType();
+            boolean bidIsBago = bid.getValue() == DiceValues.BAGO;
+            Bid lastBagoBid = getLastBagoBid(); // Ultima (maior) aposta em bago
+            Bid lastNormalBid = getLastNormalBid(); // Ultima (maior) aposta sem ser em bago (normal)
 
-        int lastNormalBidQuantity = lastNormalBid.getQuantity();
-        int lastNormalBidValue = lastNormalBid.getValue().getNumericType();
-        int lastBagoBidQuantity = lastBagoBid.getQuantity();
+            int lastNormalBidQuantity = lastNormalBid.getQuantity();
+            int lastNormalBidValue = lastNormalBid.getValue().getNumericType();
+            int lastBagoBidQuantity = lastBagoBid.getQuantity();
 
-        // Se a qtde de dados da ultima aposta normal é exatamente o dobro da qtde de dados da
-        // ultima aposta em bago
-        if (lastNormalBidQuantity == 2*lastBagoBidQuantity){
+            bid.setAllowed(false);
 
-            // Se a aposta é em bago E
-            // A qtde apostada for maior que a ultima aposta em bago
-            if (bidIsBago && bidQuantity > lastBagoBidQuantity){
-                bid.setAllowed(true);
+            // Se a qtde de dados da ultima aposta normal é exatamente o dobro da qtde de dados da
+            // ultima aposta em bago
+            if (lastNormalBidQuantity == 2*lastBagoBidQuantity){
 
+                // Se a aposta é em bago E
+                // A qtde apostada for maior que a ultima aposta em bago
+                boolean itsABagoBidAndIsAllowed = bidIsBago && bidQuantity > lastBagoBidQuantity;
                 // Se a aposta não é normal, mas é em um valor maior que o da ultima aposta normal E
                 // Tem o número de dados maior ou igual que o da ultima aposta normal
-            } else if (bidType > lastNormalBidValue && bidQuantity >= lastNormalBidQuantity) {
-                bid.setAllowed(true);
-
+                boolean itsANormalBidHigherTypeAndIsAllowed = bidType > lastNormalBidValue && bidQuantity >= lastNormalBidQuantity;
                 // Se a aposta é normal mas em um valor menor ou igual que o da ultima aposta normal E
                 // Tem o número de dados maior que o da ultima aposta normal
-            } else if (bidType <= lastNormalBidValue && bidQuantity > lastNormalBidQuantity) {
-                bid.setAllowed(true);
-            }
+                boolean itsANormalBidLowerTypeAndIsAllowed = bidType <= lastNormalBidValue && bidQuantity > lastNormalBidQuantity;
+                if (itsABagoBidAndIsAllowed || itsANormalBidHigherTypeAndIsAllowed || itsANormalBidLowerTypeAndIsAllowed){
+                    bid.setAllowed(true);
+                }
 
-            //Se a qtde de dados da ultima aposta normal é maior que o dobro da qtde de dados da ultima aposta em bago
-        } else if (lastNormalBidQuantity > 2*lastBagoBidQuantity) {
+                //Se a qtde de dados da ultima aposta normal é maior que o dobro da qtde de dados da ultima aposta em bago
+            } else if (lastNormalBidQuantity > 2*lastBagoBidQuantity) {
 
-            // Se a aposta é em bago E
-            // O dobro da qtde de dados da atual aposta é maior ou igual à qtde de dados na ultima aposta
-            if (bidIsBago && bidQuantity >= Math.ceil(lastNormalBidQuantity/2)){
-                bid.setAllowed(true);
-
+                // Se a aposta é em bago E
+                // O dobro da qtde de dados da atual aposta é maior ou igual à qtde de dados na ultima aposta
+                boolean itsABagoBidAndIsAllowed = bidIsBago && bidQuantity >= lastNormalBidQuantity/2;
                 // Se a aposta é normal mas em um valor maior que o da ultima aposta normal E
                 // Tem o número de dados maior ou igual que o da ultima aposta normal
-            } else if (bidType > lastNormalBidValue && bidQuantity >= lastNormalBidQuantity) {
-                bid.setAllowed(true);
-
+                boolean itsANormalBidHigherTypeAndIsAllowed = bidType > lastNormalBidValue && bidQuantity >= lastNormalBidQuantity;
                 // Se a aposta é normal mas em um valor menor ou igual que o da ultima aposta normal E
                 // Tem o número de dados maior que o da ultima aposta normal
-            } else if (bidType <= lastNormalBidValue && bidQuantity > lastNormalBidQuantity) {
-                bid.setAllowed(true);
+                boolean itsANormalBidLowerTypeAndIsAllowed = bidType <= lastNormalBidValue && bidQuantity > lastNormalBidQuantity;
+                if (itsABagoBidAndIsAllowed || itsANormalBidHigherTypeAndIsAllowed || itsANormalBidLowerTypeAndIsAllowed){
+                    bid.setAllowed(true);
+                }
+
+                // Se a qtde de dados da ultima aposta normal é menor que o dobro da qtde de dados da ultima aposta em bago
+            } else if (lastNormalBidQuantity < 2*lastBagoBidQuantity) {
+
+                // Se a aposta é em bago E
+                // Ela tem mais bago que na ultima aposta em bago
+                boolean itsABagoBidAndIsAllowed = bidIsBago && bidQuantity > lastBagoBidQuantity;
+                // Se a aposta é normal E
+                // Ela tem mais ou mesmo que o dobro de número de dados da ultima aposta em bago
+                boolean itsANormalBidAndIsAllowed = !bidIsBago && bidQuantity >= 2* lastBagoBidQuantity;
+                if (itsABagoBidAndIsAllowed || itsANormalBidAndIsAllowed) {
+                    bid.setAllowed(true);
+                }
             }
 
-            // Se a qtde de dados da ultima aposta normal é menor que o dobro da qtde de dados da ultima aposta em bago
-        } else if (lastNormalBidQuantity < 2*lastBagoBidQuantity) {
-
-            // Se a aposta é em bago E
-            // Ela tem mais bago que na ultima aposta em bago
-            if (bidIsBago && bidQuantity > lastBagoBidQuantity){
-                bid.setAllowed(true);
-
-                // Se a é normal E
-                // Ela tem mais ou mesmo número de dados que o da ultima aposta em bago
-            } else if (!bidIsBago && bidQuantity >= 2* lastBagoBidQuantity) {
-                bid.setAllowed(true);
+            if(!bid.isAllowed()){
+                bid.setUnallowedBidReason("Aposta inválida. A aposta atual não é maior que a última aposta feita.");
             }
-        }
-
-        if(!bid.isAllowed()){
-            bid.setUnallowedBidReason("Aposta inválida. A aposta atual não é maior que a última aposta feita.");
         }
     }
 
@@ -206,6 +205,7 @@ public class DefaultMatchService implements MatchService {
     public void iniciarNovoTurno() {
         this.match.getBetHistory().clear();
         this.match.getTotalDicesMatch();
+        this.match.resetPlayersDices();
         // gerarDadosProsPlayers (respeitando a quatde de dados de cada Player)
         // informar de quem é a vez ( quem perdeu dado recomeça o turno)
     }
@@ -220,23 +220,4 @@ public class DefaultMatchService implements MatchService {
     public Match getMatch() {
         return match;
     }
-
-    //    private Long getNextPlayer(Long idJogador,String order) {
-//        int playerPosition = 0;
-//        for (Player player : match.getPlayers()) {
-//            if (player.getId() == idJogador) {
-//                break;
-//            }
-//            playerPosition += 1;
-//        }
-//        if (order == "top-down" && playerPosition < match.getNumberOfPlayer() - 1) {
-//            return match.getPlayers().get(playerPosition + 1).getId();
-//        } else if (order == "top-down") {
-//            return match.getPlayers().get(0).getId();
-//        } else if (order == "bottom-up" && playerPosition > 0) {
-//            return match.getPlayers().get(playerPosition - 1).getId();
-//        } else {
-//            return match.getPlayers().get(Math.toIntExact(match.getNumberOfPlayer() - 1L)).getId();
-//        }
-//    }
 }
