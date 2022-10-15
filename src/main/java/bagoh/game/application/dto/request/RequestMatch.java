@@ -1,6 +1,6 @@
 package bagoh.game.application.dto.request;
 
-public class RequestMatchDto {
+public class RequestMatch {
 
 
     private long numberOfPlayers;

@@ -2,10 +2,7 @@ package bagoh.game.application.controller;
 
 
 import bagoh.game.application.domain.Match;
-import bagoh.game.application.dto.request.RequestMatchDto;
-//import bagoh.game.application.entity.Match;
-//import bagoh.game.application.repository.MatchRepository;
-//import bagoh.game.application.service.usercase.CreateMatchService;
+import bagoh.game.application.dto.request.RequestMatch;
 import bagoh.game.application.domain.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +21,7 @@ public class MatchController {
     private MatchService matchService;
 
 
+
     @GetMapping(value = "/match/{id}", produces="application/json")
     public ResponseEntity<Match> GetById(@PathVariable(value = "id") long id) {
         Match matchCreated = new Match(2 , 3);
@@ -39,7 +37,7 @@ public class MatchController {
     }
 
     @PostMapping(value = "/match", produces="application/json", consumes="application/json")
-    public ResponseEntity<Match> Post(@Validated @RequestBody RequestMatchDto match)
+    public ResponseEntity<Match> Post(@Validated @RequestBody RequestMatch match)
     {
          Match matchCreated = new Match(2 , 3);
          return new ResponseEntity<Match>(matchCreated, HttpStatus.OK);
