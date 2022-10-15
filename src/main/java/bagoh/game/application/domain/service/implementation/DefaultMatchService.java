@@ -1,10 +1,10 @@
-package bagoh.game.application.service.implementation;
+package bagoh.game.application.domain.service.implementation;
 
-import bagoh.game.application.dto.domainDto.DiceValues;
-import bagoh.game.application.dto.domainDto.Match;
-import bagoh.game.application.dto.domainDto.Player;
-import bagoh.game.application.dto.domainDto.Bid;
-import bagoh.game.application.service.MatchService;
+import bagoh.game.application.domain.DiceValues;
+import bagoh.game.application.domain.Match;
+import bagoh.game.application.domain.Player;
+import bagoh.game.application.domain.Bid;
+import bagoh.game.application.domain.service.MatchService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,13 +36,13 @@ public class DefaultMatchService implements MatchService {
     }
 
     @Override
-    public Bid registrarAposta(Bid bid) {
-        validatePlayer(bid);
-        basicAllowedBidValidation(bid);
-        completeAllowedBidValidation(bid);
+    public Bid saveBid(Bid bid) {
+        validateIfPlayerExists(bid);
+        validateIfQuantityAndValuesAreValid(bid);
+        validateIfBidIsBiggerThanLastBid(bid);
 
         if (bid.isAllowed()){
-            this.match.getBetHistory().add(bid);
+            this.match.addBidInBetHistory(bid);
             this.match.setLastBid(bid);
         }
 
@@ -50,7 +50,7 @@ public class DefaultMatchService implements MatchService {
     }
 
     @Override
-    public Boolean validarAposta() {
+    public Boolean validateIfBidIsTrue() {
         int[] totalOfEachDiceValueInGame = match.countDicesInTurn();
         int bagosInGame = totalOfEachDiceValueInGame[0];
 
@@ -75,7 +75,7 @@ public class DefaultMatchService implements MatchService {
     }
 
 
-    private void validatePlayer(Bid bid) {
+    private void validateIfPlayerExists(Bid bid) {
         bid.setAllowed(false);
         bid.setUnallowedBidReason("Não foi possível validar o jogador que fez a aposta.");
 
@@ -93,26 +93,24 @@ public class DefaultMatchService implements MatchService {
 
     }
 
-    private void basicAllowedBidValidation(Bid bid) {
+    private void validateIfQuantityAndValuesAreValid(Bid bid) {
         if (bid.isAllowed()) {
             int bidQuantity = bid.getQuantity();
             int bidType = bid.getValue().getNumericType();
             int bago = 1;
             int sena = 6;
 
-            bid.setAllowed(false);
-
             if (bidQuantity > match.getTotalDicesMatch()){
                 bid.setUnallowedBidReason("Aposta maior que a quantidade de dados na mesa.");
+                bid.setAllowed(false);
             } else if (bidQuantity <= 0 || bidType < bago || bidType > sena){
                 bid.setUnallowedBidReason("Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.");
-            } else {
-                bid.setAllowed(true);
+                bid.setAllowed(false);
             }
         }
     }
 
-    private void completeAllowedBidValidation(Bid bid) {
+    private void validateIfBidIsBiggerThanLastBid(Bid bid) {
         if (bid.isAllowed()) {
             int bidQuantity = bid.getQuantity();
             int bidType = bid.getValue().getNumericType();

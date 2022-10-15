@@ -1,12 +1,12 @@
 package bagoh.game.application.controller;
 
 
-import bagoh.game.application.dto.domainDto.Match;
-import bagoh.game.application.dto.requestDto.RequestMatchDto;
+import bagoh.game.application.domain.Match;
+import bagoh.game.application.dto.request.RequestMatchDto;
 //import bagoh.game.application.entity.Match;
 //import bagoh.game.application.repository.MatchRepository;
 //import bagoh.game.application.service.usercase.CreateMatchService;
-import bagoh.game.application.service.MatchService;
+import bagoh.game.application.domain.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

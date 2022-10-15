@@ -1,4 +1,4 @@
-package bagoh.game.application.dto.domainDto;
+package bagoh.game.application.domain;
 
 public class Bid {
 

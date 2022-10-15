@@ -1,9 +1,9 @@
 package bagoh.game.application.service;
 
-import bagoh.game.application.dto.domainDto.Bid;
-import bagoh.game.application.dto.domainDto.DiceValues;
-import bagoh.game.application.dto.domainDto.Player;
-import bagoh.game.application.service.implementation.DefaultMatchService;
+import bagoh.game.application.domain.Bid;
+import bagoh.game.application.domain.DiceValues;
+import bagoh.game.application.domain.Player;
+import bagoh.game.application.domain.service.implementation.DefaultMatchService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,11 +16,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderLastBid() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,4,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         Assertions.assertSame(bid3, service.getMatch().getLastBid());
     }
 
@@ -28,11 +28,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderBidHistorySize() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,4,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         Assertions.assertEquals(3,service.getMatch().getBetHistory().size());
     }
 
@@ -40,11 +40,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderBidHistoryLastElement() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,4,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         List<Bid> bidHistory = service.getMatch().getBetHistory();
         Assertions.assertSame(bid3, bidHistory.get(bidHistory.size()-1));
     }
@@ -53,11 +53,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderLowBidRegistration() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,3,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         Assertions.assertFalse(bid3.isAllowed());
     }
 
@@ -65,11 +65,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderLowBidMessage() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,3,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         String unregisteredReason = "Aposta inválida. A aposta atual não é maior que a última aposta feita.";
         Assertions.assertEquals(unregisteredReason,bid3.getUnallowedBidReason());
     }
@@ -78,11 +78,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderWrongPlayerIdRegistration() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,4,-3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         Assertions.assertFalse(bid3.isAllowed());
     }
 
@@ -90,11 +90,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderWrongPlayerIdMessage() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,4,-3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         String unregisteredReason = "Jogador não identificado, id inexistente.";
         Assertions.assertEquals(unregisteredReason,bid3.getUnallowedBidReason());
     }
@@ -103,11 +103,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderWrongDicesQuantityRegistration() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,13,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         Assertions.assertFalse(bid3.isAllowed());
     }
 
@@ -115,11 +115,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderWrongDicesQuantityMessage() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,13,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         String unregisteredReason = "Aposta maior que a quantidade de dados na mesa.";
         Assertions.assertEquals(unregisteredReason,bid3.getUnallowedBidReason());
     }
@@ -128,11 +128,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderNegativeDicesQuantityRegistration() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,-4,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         Assertions.assertFalse(bid3.isAllowed());
     }
 
@@ -140,11 +140,11 @@ class DefaultMatchServiceTest {
     void shouldValidateBidRecorderNegativeDicesQuantityMessage() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid1 = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid1);
+        service.saveBid(bid1);
         Bid bid2 = new Bid(DiceValues.QUINA,4,2L);
-        service.registrarAposta(bid2);
+        service.saveBid(bid2);
         Bid bid3 = new Bid(DiceValues.SENA,-4,3L);
-        service.registrarAposta(bid3);
+        service.saveBid(bid3);
         String unregisteredReason = "Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.";
         Assertions.assertEquals(unregisteredReason,bid3.getUnallowedBidReason());
     }
@@ -153,8 +153,8 @@ class DefaultMatchServiceTest {
     void shouldValidateBidValidatorWrongQuantityBagoh() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid = new Bid(DiceValues.BAGO,2,1L);
-        service.registrarAposta(bid);
-        boolean validation = service.validarAposta();
+        service.saveBid(bid);
+        boolean validation = service.validateIfBidIsTrue();
         Assertions.assertFalse(validation);
     }
 
@@ -163,8 +163,8 @@ class DefaultMatchServiceTest {
     void shouldValidateBidValidatorWrongQuantityNormal() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid = new Bid(DiceValues.SENA,1,2L);
-        service.registrarAposta(bid);
-        boolean validation = service.validarAposta();
+        service.saveBid(bid);
+        boolean validation = service.validateIfBidIsTrue();
         Assertions.assertFalse(validation);
     }
 
@@ -172,8 +172,8 @@ class DefaultMatchServiceTest {
     void shouldValidateBidValidatorRightQuantityBagoh() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid = new Bid(DiceValues.BAGO,1,3L);
-        service.registrarAposta(bid);
-        boolean validation = service.validarAposta();
+        service.saveBid(bid);
+        boolean validation = service.validateIfBidIsTrue();
         Assertions.assertTrue(validation);
     }
 
@@ -181,8 +181,8 @@ class DefaultMatchServiceTest {
     void shouldValidateBidValidatorRightQuantityNormal() {
         DefaultMatchService service = gerarRodadaTeste();
         Bid bid = new Bid(DiceValues.QUADRA,4,1L);
-        service.registrarAposta(bid);
-        boolean validation = service.validarAposta();
+        service.saveBid(bid);
+        boolean validation = service.validateIfBidIsTrue();
         Assertions.assertTrue(validation);
     }
 

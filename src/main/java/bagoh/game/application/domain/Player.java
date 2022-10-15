@@ -1,6 +1,4 @@
-package bagoh.game.application.dto.domainDto;
-
-import java.util.List;
+package bagoh.game.application.domain;
 
 public class Player {
 

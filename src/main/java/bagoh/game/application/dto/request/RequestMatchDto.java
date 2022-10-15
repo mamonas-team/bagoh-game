@@ -1,4 +1,4 @@
-package bagoh.game.application.dto.requestDto;
+package bagoh.game.application.dto.request;
 
 public class RequestMatchDto {
 

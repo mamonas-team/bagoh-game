@@ -1,7 +1,7 @@
 package bagoh.game.application;
 
-import bagoh.game.application.dto.domainDto.Player;
-import bagoh.game.application.service.implementation.DefaultMatchService;
+import bagoh.game.application.domain.Player;
+import bagoh.game.application.domain.service.implementation.DefaultMatchService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;

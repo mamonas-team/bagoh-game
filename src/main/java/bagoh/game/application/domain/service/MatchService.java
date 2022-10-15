@@ -1,8 +1,8 @@
-package bagoh.game.application.service;
+package bagoh.game.application.domain.service;
 
-import bagoh.game.application.dto.domainDto.Bid;
-import bagoh.game.application.dto.domainDto.Match;
-import bagoh.game.application.dto.domainDto.Player;
+import bagoh.game.application.domain.Bid;
+import bagoh.game.application.domain.Match;
+import bagoh.game.application.domain.Player;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public interface MatchService {
 
 
     /**
-     * Esté método é responsável por gerar dados pra seus jogadores.
+     * Este método é responsável por gerar dados pra seus jogadores.
      * @param gerarPrimeiroDado Indica se deve gerar o primeiro dado de cada jogador.
      * @return Retorna uma lista de Players com dados gerados.
      */
@@ -33,16 +33,16 @@ public interface MatchService {
 
     /**
      * Este método é responsável por registrar as apostas que são feitas na partida.
-     * @param bid aposta a ser validada.
-     * @return A aposta com sua validade atualizada e se for inválida com o motivo da invalidex no atributo invalidReason
+     * @param bid Aposta a ser validada.
+     * @return Retorna uma Aposta com status validada/invalidada e o motivo da invalidez.
      */
-    Bid registrarAposta(Bid bid);
+    Bid saveBid(Bid bid);
 
 
     /**
      * Este método é responsável por validar a última aposta.
-     * @return true se a aposta for verdadeira ou false caso contrario
+     * @return Retorna true se a aposta for verdadeira ou false caso contrário
      */
-    Boolean validarAposta();
+    Boolean validateIfBidIsTrue();
 
 }

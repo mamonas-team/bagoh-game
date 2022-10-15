@@ -1,4 +1,4 @@
-package bagoh.game.application.dto.domainDto;
+package bagoh.game.application.domain;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -124,5 +124,9 @@ public class Match {
 
     public List<Bid> getBetHistory() {
         return betHistory;
+    }
+
+    public void addBidInBetHistory(Bid bid) {
+        this.betHistory.add(bid);
     }
 }
