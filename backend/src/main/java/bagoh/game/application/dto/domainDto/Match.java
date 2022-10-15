@@ -16,12 +16,26 @@ public class Match {
     private Player firstPlayer;
     private List<Player> players = new ArrayList<>();
     private List<Bid> betHistory = new ArrayList<>();
-    private Bid lastBid;
-
 
     public Match(int numberOfPlayer, int numberOfInitialDices) {
         this.numberOfPlayer = numberOfPlayer;
         this.numberOfInitialDices = numberOfInitialDices;
+    }
+
+    public void resetPlayersDices() {
+        for (Player player : players) {
+            player.getDices().resetDices();
+        }
+    }
+    public int[] countDicesInTurn(){
+        int[] dicesOfTurn = new int[6];
+        for (Player player : players){
+            int[] dicesQuantities = player.getDices().getDicesQuantities();
+            for (int i=0; i<dicesQuantities.length; i++){
+                dicesOfTurn[i] += dicesQuantities[i];
+            }
+        }
+        return dicesOfTurn;
     }
 
     public Date getStartDate() {
@@ -63,7 +77,7 @@ public class Match {
     public int getTotalDicesMatch() {
         totalDicesMatch = 0;
         for (Player player : players){
-            totalDicesMatch += player.getNumberOfDices();
+            totalDicesMatch += player.getDices().getNumberOfDices();
         }
         return totalDicesMatch;
     }
@@ -101,18 +115,14 @@ public class Match {
     }
 
     public Bid getLastBid() {
-        return lastBid;
+        return betHistory.get(betHistory.size()-1);
     }
 
     public void setLastBid(Bid lastBid) {
-        this.lastBid = lastBid;
+        this.betHistory.set(betHistory.size()-1, lastBid);
     }
 
     public List<Bid> getBetHistory() {
         return betHistory;
-    }
-
-    public void setBetHistory(List<Bid> betHistory) {
-        this.betHistory = betHistory;
     }
 }
