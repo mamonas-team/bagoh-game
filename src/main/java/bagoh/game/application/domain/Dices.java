@@ -5,7 +5,7 @@ import java.util.List;
 public class Dices {
 
     private int numberOfDices;
-    private List<DiceValues> fightDice;
+    private List<DiceValues> battleDice;
     private int[] dicesQuantities = new int[6]; //[bagos,duques,ternas,quadras,quinas,senas]
 
     public Dices(int numberOfDices) {
@@ -14,7 +14,7 @@ public class Dices {
 
     public void resetDices() {
         this.dicesQuantities = new int[6];
-        this.fightDice.clear();
+        this.battleDice.clear();
     }
 
     public int getNumberOfDices() {
@@ -25,8 +25,8 @@ public class Dices {
         this.numberOfDices = numberOfDices;
     }
 
-    public List<DiceValues> getFightDice() {
-        return fightDice;
+    public List<DiceValues> getBattleDice() {
+        return battleDice;
     }
 
     public int[] getDicesQuantities() {

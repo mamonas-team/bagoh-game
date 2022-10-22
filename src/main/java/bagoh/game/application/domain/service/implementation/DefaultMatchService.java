@@ -218,4 +218,8 @@ public class DefaultMatchService implements MatchService {
     public Match getMatch() {
         return match;
     }
+
+    public void setMatch(Match match) {
+        this.match = match;
+    }
 }
