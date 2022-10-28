@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-class DefaultMatchServiceTest {
+class SaveBidTests {
 
     @Test
     void shouldValidateBidRecorderLastBid() {
@@ -147,43 +147,6 @@ class DefaultMatchServiceTest {
         service.saveBid(bid3);
         String unregisteredReason = "Aposta inválida. Os valores dos dados vão de 1 a 6 apenas.";
         Assertions.assertEquals(unregisteredReason,bid3.getUnallowedBidReason());
-    }
-
-    @Test
-    void shouldValidateBidValidatorWrongQuantityBagoh() {
-        DefaultMatchService service = gerarRodadaTeste();
-        Bid bid = new Bid(DiceValues.BAGO,2,1L);
-        service.saveBid(bid);
-        boolean validation = service.validateIfBidIsTrue();
-        Assertions.assertFalse(validation);
-    }
-
-
-    @Test
-    void shouldValidateBidValidatorWrongQuantityNormal() {
-        DefaultMatchService service = gerarRodadaTeste();
-        Bid bid = new Bid(DiceValues.SENA,1,2L);
-        service.saveBid(bid);
-        boolean validation = service.validateIfBidIsTrue();
-        Assertions.assertFalse(validation);
-    }
-
-    @Test
-    void shouldValidateBidValidatorRightQuantityBagoh() {
-        DefaultMatchService service = gerarRodadaTeste();
-        Bid bid = new Bid(DiceValues.BAGO,1,3L);
-        service.saveBid(bid);
-        boolean validation = service.validateIfBidIsTrue();
-        Assertions.assertTrue(validation);
-    }
-
-    @Test
-    void shouldValidateBidValidatorRightQuantityNormal() {
-        DefaultMatchService service = gerarRodadaTeste();
-        Bid bid = new Bid(DiceValues.QUADRA,4,1L);
-        service.saveBid(bid);
-        boolean validation = service.validateIfBidIsTrue();
-        Assertions.assertTrue(validation);
     }
 
     DefaultMatchService gerarRodadaTeste() {
