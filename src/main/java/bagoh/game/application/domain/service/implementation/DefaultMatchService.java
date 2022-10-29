@@ -5,6 +5,11 @@ import bagoh.game.application.domain.Match;
 import bagoh.game.application.domain.Player;
 import bagoh.game.application.domain.Bid;
 import bagoh.game.application.domain.service.MatchService;
+import bagoh.game.application.dto.response.ResponseBattleDices;
+import bagoh.game.application.dto.response.ResponseBidValidator;
+import bagoh.game.application.dto.response.ResponseDices;
+import bagoh.game.application.dto.response.ResponseSaveBid;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,7 +48,6 @@ public class DefaultMatchService implements MatchService {
 
         if (bid.isAllowed()){
             this.match.addBidInBetHistory(bid);
-            this.match.setLastBid(bid);
         }
 
         return bid;
@@ -70,12 +74,12 @@ public class DefaultMatchService implements MatchService {
             }
         }
 
-        match.setLastBid(bid);
+        match.setLastBid(bid); //set last bid with status isTrue
         return bid.isTrue();
     }
 
 
-    private void validateIfPlayerExists(Bid bid) {
+    private void validateIfPlayerExists(@NotNull Bid bid) {
         bid.setAllowed(false);
         bid.setUnallowedBidReason("Não foi possível validar o jogador que fez a aposta.");
 
@@ -93,7 +97,7 @@ public class DefaultMatchService implements MatchService {
 
     }
 
-    private void validateIfQuantityAndValuesAreValid(Bid bid) {
+    private void validateIfQuantityAndValuesAreValid(@NotNull Bid bid) {
         if (bid.isAllowed()) {
             int bidQuantity = bid.getQuantity();
             int bidType = bid.getValue().getNumericType();
@@ -110,7 +114,7 @@ public class DefaultMatchService implements MatchService {
         }
     }
 
-    private void validateIfBidIsBiggerThanLastBid(Bid bid) {
+    private void validateIfBidIsBiggerThanLastBid(@NotNull Bid bid) {
         if (bid.isAllowed()) {
             int bidQuantity = bid.getQuantity();
             int bidType = bid.getValue().getNumericType();
@@ -208,13 +212,6 @@ public class DefaultMatchService implements MatchService {
         // informar de quem é a vez ( quem perdeu dado recomeça o turno)
     }
 
-    public void printPlayers() {
-        List<Player> players = match.getPlayers();
-        for (Player player : players) {
-            System.out.println(player.getName());
-        }
-    }
-
     public Match getMatch() {
         return match;
     }
@@ -222,4 +219,58 @@ public class DefaultMatchService implements MatchService {
     public void setMatch(Match match) {
         this.match = match;
     }
+
+    public ResponseBidValidator responseBidValidatorDTO(Long idPlayer) {
+        ResponseBidValidator responseBidValidator = new ResponseBidValidator();
+        boolean bidIsTrue = this.getMatch().getLastBid().isTrue();
+        responseBidValidator.setBidIsTrue(bidIsTrue);
+        String message;
+
+        if (bidIsTrue) {
+            message = "O jogador " + idPlayer + " duvidou de uma aposta verdadeira e perdeu 1 dado.";
+        } else {
+            message = "O jogador " + this.getMatch().getLastBid().getIdPlayer() + " fez uma aposta falsa e perdeu 1 dado.";
+        }
+
+        responseBidValidator.setStatusMatch(message);
+
+        return responseBidValidator;
+    }
+
+    public ResponseDices responseDicesDTO() {
+        ResponseDices responseDices = new ResponseDices();
+
+        for (Player player : this.match.getPlayers()) {
+            responseDices.addDice(player.getDices().getDicesQuantities());
+            responseDices.addPlayer(player.getName());
+        }
+
+        return responseDices;
+    }
+
+    public ResponseBattleDices responseBattleDicesDTO() {
+        ResponseBattleDices responseBattleDices = new ResponseBattleDices();
+
+        for (Player player : this.getMatch().getPlayers()) {
+            responseBattleDices.addDice(player.getDices().getBattleDice());
+            responseBattleDices.addPlayer(player.getName());
+        }
+
+        return responseBattleDices;
+    }
+
+    public ResponseSaveBid responseSaveBidDTO(@NotNull Bid bid) {
+
+        ResponseSaveBid responseSaveBid = new ResponseSaveBid();
+        responseSaveBid.setAllowed(bid.isAllowed());
+
+        if (bid.isAllowed()) {
+            responseSaveBid.statusMatch("A aposta feita pelo jogador "+bid.getIdPlayer()+" foi salva.");
+        } else {
+            responseSaveBid.statusMatch("A aposta feita pelo jogador "+bid.getIdPlayer()+" não foi salva. A última aposta foi feita por "+this.match.getLastBid().getIdPlayer());
+        }
+
+        return responseSaveBid;
+    }
+
 }
